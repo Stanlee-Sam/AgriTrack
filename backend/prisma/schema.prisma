@@ -1,0 +1,67 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  admin
+  agent
+}
+
+enum Stage {
+  planted
+  growing
+  ready
+  harvested
+  }
+
+model User {
+  id String @id @default(uuid())
+  name String
+  email String @unique
+  password String
+  role Role @default(agent)
+
+  assignedFields Field[] @relation("AssignedFields")
+  fieldUpdates FieldUpdate[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Field {
+  id String @id @default(uuid())
+  name String
+  cropType String
+  plantingDate DateTime
+  currentStage Stage @default(planted)
+
+  assignedAgentId String?
+  agent User? @relation("AssignedFields", fields: [assignedAgentId], references: [id])
+
+  fieldUpdates FieldUpdate[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([assignedAgentId])
+}
+
+model FieldUpdate {
+  id String @id @default(uuid())
+  fieldId String
+  field Field @relation(fields: [fieldId], references: [id])
+  agentId String
+  agent User @relation(fields: [agentId], references: [id])
+  newStage Stage
+  note String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([fieldId])
+  @@index([agentId])
+}
