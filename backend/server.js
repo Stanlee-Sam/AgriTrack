@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import authRoutes from "./Routes/authRoutes.js";
 import fieldRoutes from "./Routes/fieldRoutes.js";
 import fieldUpdateRoutes from './Routes/fieldUpdateRoutes.js'
+import dashboardRoutes from './Routes/dashboardRoutes.js'
 
 dotenv.config();
 
@@ -21,6 +22,7 @@ app.use(
 app.use("/auth", authRoutes);
 app.use("/fields", fieldRoutes);
 app.use('/updates', fieldUpdateRoutes)
+app.use('/dashboard', dashboardRoutes)
 
 app.listen(5000, () => {
   console.log("Server is running on port 5000");
