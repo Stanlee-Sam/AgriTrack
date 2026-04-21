@@ -49,6 +49,7 @@ model Field {
   updatedAt DateTime @updatedAt
 
   @@index([assignedAgentId])
+  @@unique([name, cropType, plantingDate, currentStage])
 }
 
 model FieldUpdate {
