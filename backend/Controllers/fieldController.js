@@ -98,6 +98,19 @@ export const updateField = async (req, res) => {
     const { name, cropType, plantingDate, currentStage } = req.body;
     const fieldId = req.params.id;
 
+    if (!name || !cropType || !plantingDate || !currentStage) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    if (!STAGES.includes(currentStage)) {
+      return res.status(400).json({ message: "Invalid field stage" });
+    }
+
+    const parsedPlantingDate = parsePlantingDate(plantingDate);
+    if (!parsedPlantingDate) {
+      return res.status(400).json({ message: "Invalid planting date" });
+    }
+
     const existingField = await prisma.field.findUnique({
       where: {
         id: fieldId,
@@ -108,37 +121,14 @@ export const updateField = async (req, res) => {
       return res.status(404).json({ message: "Field does not exist" });
     }
 
-    const updateData = {};
-
-    if (name !== undefined) {
-      updateData.name = name;
-    }
-    if (cropType !== undefined) {
-      updateData.cropType = cropType;
-    }
-    if (plantingDate !== undefined) {
-      const parsedPlantingDate = parsePlantingDate(plantingDate);
-      if (!parsedPlantingDate) {
-        return res.status(400).json({ message: "Invalid planting date" });
-      }
-      updateData.plantingDate = parsedPlantingDate;
-    }
-    if (currentStage !== undefined) {
-      if (!STAGES.includes(currentStage)) {
-        return res.status(400).json({ message: "Invalid field stage" });
-      }
-      updateData.currentStage = currentStage;
-    }
-
-    if (Object.keys(updateData).length === 0) {
-      return res
-        .status(400)
-        .json({ message: "No valid fields provided for update" });
-    }
-
     const updatedField = await prisma.field.update({
       where: { id: fieldId },
-      data: updateData,
+      data: {
+        name,
+        cropType,
+        plantingDate: parsedPlantingDate,
+        currentStage,
+      },
     });
 
     res.status(200).json({
