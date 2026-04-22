@@ -27,7 +27,7 @@ export default function DashboardAgent() {
               <h1 className="font-bold text-3xl text-on-surface">
                 Your Assigned Fields
               </h1>
-              <p className="font-light text-neutral">
+            <p className="font-body-md text-body-md text-on-surface-variant">
                 Welcome back, Agent Smith. Here is your current operational
                 overview.
               </p>
