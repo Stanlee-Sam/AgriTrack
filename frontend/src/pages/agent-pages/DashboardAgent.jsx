@@ -1,10 +1,17 @@
-import RoleDashboardLayout from '../../components/layout/RoleDashboardLayout'
-import { navigationByRole } from '../../components/layout/navigation'
+import {
+  ClipboardList,
+  Eye,
+  MapPinPlusInside,
+  Tractor,
+  TriangleAlert,
+} from "lucide-react";
+import RoleDashboardLayout from "../../components/layout/RoleDashboardLayout";
+import { navigationByRole } from "../../components/layout/navigation";
 
 export default function DashboardAgent() {
   const handleLogout = () => {
-    window.alert('Logout action goes here.')
-  }
+    window.alert("Logout action goes here.");
+  };
 
   return (
     <RoleDashboardLayout
@@ -13,40 +20,228 @@ export default function DashboardAgent() {
       navItems={navigationByRole.agent}
       onLogout={handleLogout}
     >
-      <section className="rounded-3xl border border-outline-variant bg-surface-container-lowest p-6 shadow-[0_12px_30px_rgba(45,106,79,0.08)] lg:p-8">
-        <p className="text-xs font-medium leading-[1.2] uppercase tracking-[0.14em] text-secondary">
-          Agent Dashboard
-        </p>
-        <h1 className="mt-3 text-[3rem] font-bold leading-[1.2] tracking-[-0.02em] text-on-surface">Welcome back</h1>
-        <p className="mt-4 max-w-2xl text-[1.125rem] font-normal leading-[1.6] text-neutral">
-          This is your starter agent dashboard page. Add assigned field data,
-          daily tasks, and reporting actions here.
-        </p>
-      </section>
+      <main className="pb-xl min-h-screen">
+        <div className="max-w-7xl mx-auto space-y-md  flex flex-col gap-5">
+          <header className="flex flex-col gap-3 md:flex-row md:items-end justify-between gap-sm">
+            <div>
+              <h1 className="font-bold text-3xl text-on-surface">
+                Your Assigned Fields
+              </h1>
+              <p className="font-light text-neutral">
+                Welcome back, Agent Smith. Here is your current operational
+                overview.
+              </p>
+            </div>
+            <div className="flex ">
+              <button className="bg-primary w-full text-on-primary px-5 py-3 rounded-lg font-label-md hover:bg-primary/90 transition-all flex items-center justify-center gap-xs">
+                <MapPinPlusInside className="material-symbols-outlined text-[20px]">
+                  add_location
+                </MapPinPlusInside>{" "}
+                New Field Report
+              </button>
+            </div>
+          </header>
+          <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="bg-surface-container-lowest p-5 rounded-lg shadow-[0_12px_24px_rgba(45,106,79,0.08)] flex flex-col justify-between min-h-40">
+              <div className="flex justify-between items-start">
+                <div className="bg-secondary p-3   rounded-lg">
+                  <ClipboardList
+                    className="text-foreground "
+                    data-icon="assignment"
+                  ></ClipboardList>
+                </div>
 
-      <section className="mt-6 grid gap-6 lg:grid-cols-3">
-        <div className="rounded-2xl border border-outline-variant bg-surface-container-lowest p-6">
-          <h2 className="text-[1.5rem] font-semibold leading-[1.4] text-on-surface">Overview</h2>
-          <p className="mt-3 text-base font-normal leading-[1.6] text-on-surface-variant">
-            Replace this block with the agent summary content.
-          </p>
-        </div>
+                <span className="text-caption font-semibold text-secondary">
+                  Updated Today
+                </span>
+              </div>
+              <div>
+                <p className="text-3xl font-bold text-on-surface">12</p>
+                <p className="font-semibold text-on-surface-variant">
+                  Assigned Fields
+                </p>
+              </div>
+            </div>
+            <div className="bg-surface-container-lowest p-5 rounded-lg shadow-[0_12px_24px_rgba(45,106,79,0.08)] border-l-4 border-error flex flex-col justify-between min-h-40">
+              <div className="flex justify-between items-start">
+                <div
+                  className="p-3 rounded-lg bg-error-container text-on-error-container "
+                  data-icon="warning"
+                >
+                  <TriangleAlert />
+                </div>
+                <span className="text-caption font-semibold text-error">
+                  Attention Required
+                </span>
+              </div>
+              <div>
+                <p className="text-3xl font-bold text-on-surface">2</p>
+                <p className="font-semibold text-on-surface-variant">
+                  Fields At Risk
+                </p>
+              </div>
+            </div>
+            <div className="bg-surface-container-lowest p-5 rounded-lg shadow-[0_12px_24px_rgba(45,106,79,0.08)] flex flex-col justify-between min-h-[160px]">
+              <div className="flex justify-between items-start">
+                <div
+                  className="p-3 bg-tertiary-container text-on-tertiary-container rounded-lg"
+                  data-icon="agriculture"
+                >
+                  <Tractor />
+                </div>
+                <span className="text-caption font-semibold text-tertiary">
+                  Optimal Window
+                </span>
+              </div>
+              <div>
+                <p className="text-3xl font-bold text-on-surface">4</p>
+                <p className="font-semibold text-on-surface-variant">
+                  Fields Ready for Harvest
+                </p>
+              </div>
+            </div>
+          </section>
 
-        <div className="rounded-2xl border border-outline-variant bg-surface-container-lowest p-6">
-          <h2 className="text-[1.5rem] font-semibold leading-[1.4] text-on-surface">My Fields</h2>
-          <p className="mt-3 text-base font-normal leading-[1.6] text-on-surface-variant">
-            Use this area for assigned field metrics or quick actions.
-          </p>
+          <section className="bg-surface-container-lowest rounded-xl shadow-[0_12px_24px_rgba(45,106,79,0.08)] overflow-hidden">
+            <div className="px-5 py-6 border-b border-outline-variant flex justify-between items-center">
+              <h3 className="font-semibold text-2xl">
+                Active Field Monitoring
+              </h3>
+              {/* <div className="">
+                <div className="relative">
+                  <span className="material-symbols-outlined absolute left-base top-1/2 -translate-y-1/2 text-outline text-[20px]">
+                    search
+                  </span>
+                  <input
+                    className="pl-xl pr-base py-xs bg-[#F1F3F5] border-none rounded-lg text-sm focus:ring-2 focus:ring-primary/10"
+                    placeholder="Search fields..."
+                    type="text"
+                  />
+                </div>
+              </div> */}
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead className="bg-surface-container text-on-surface-variant font-label-md">
+                  <tr>
+                    <th className="px-5 py-4 border-b border-outline-variant">
+                      Field Name
+                    </th>
+                    <th className="px-5 py-4 border-b border-outline-variant">
+                      Crop Type
+                    </th>
+                    <th className="px-5 py-4 border-b border-outline-variant">
+                      Current Stage
+                    </th>
+                    <th className="px-5 py-4 border-b border-outline-variant">
+                      Status
+                    </th>
+                    <th className="px-5 py-4 border-b border-outline-variant text-right">
+                      Action
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="font-body-md text-on-surface">
+                  <tr className="hover:bg-primary/5 transition-colors border-b border-outline-variant">
+                    <td className="px-5 py-5">
+                      <div className="flex items-center gap-sm">
+                        <span className="font-semibold">North Cornfield</span>
+                      </div>
+                    </td>
+                    <td className="px-5 py-3">Corn</td>
+                    <td className="px-5 py-3">
+                      <div className="flex flex-col gap-xs">
+                        <span className="text-caption">Maturity (85%)</span>
+                        <div className="w-32 h-1.5 bg-surface-container-highest rounded-full">
+                          <div className="w-[85%] h-full bg-primary rounded-full"></div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-5 py-3">
+                      <span className="px-2 py-1 bg-secondary-container/30 text-on-secondary-container rounded-full text-caption font-bold border border-secondary/20">
+                        Active
+                      </span>
+                    </td>
+                    <td className="px-5 py-3 text-right">
+                      <button className="text-primary hover:bg-primary/10 p-xs rounded-full transition-all">
+                        <Eye className="material-symbols-outlined">
+                          visibility
+                        </Eye>
+                      </button>
+                    </td>
+                  </tr>
+                  <tr className="hover:bg-primary/5 transition-colors border-b border-outline-variant bg-surface-container-low">
+                    <td className="px-5 py-4">
+                      <div className="flex items-center gap-sm">
+                       
+                        <span className="font-semibold">East Vineyard</span>
+                      </div>
+                    </td>
+                    <td className="px-5 py-3">Grapes</td>
+                    <td className="px-5 py-3">Irrigating</td>
+                    <td className="px-5 py-3">
+                      <span className="px-2 py-1 bg-error-container/30 text-on-error-container rounded-full text-caption font-bold border border-error/20">
+                        At Risk
+                      </span>
+                    </td>
+                    <td className="px-5 py-3 text-right">
+                      <button className="text-primary hover:bg-primary/10 p-xs rounded-full transition-all">
+                        <Eye className="material-symbols-outlined">
+                          visibility
+                        </Eye>
+                      </button>
+                    </td>
+                  </tr>
+                  <tr className="hover:bg-primary/5 transition-colors border-b border-outline-variant">
+                    <td className="px-5 py-4">
+                      <div className="flex items-center gap-sm">
+                        
+                        <span className="font-semibold">West Wheat Patch</span>
+                      </div>
+                    </td>
+                    <td className="px-5 py-3">Wheat</td>
+                    <td className="px-5 py-3">Harvesting</td>
+                    <td className="px-5 py-3">
+                      <span className="px-2 py-1 bg-tertiary-container/30 text-foreground rounded-full text-caption font-bold border border-tertiary/20">
+                        Completed
+                      </span>
+                    </td>
+                    <td className="px-5 py-3 text-right">
+                      <button className="text-primary hover:bg-primary/10 p-xs rounded-full transition-all">
+                        <Eye className="material-symbols-outlined">
+                          visibility
+                        </Eye>
+                      </button>
+                    </td>
+                  </tr>
+                  <tr className="hover:bg-primary/5 transition-colors">
+                    <td className="px-5 py-4">
+                      <div className="flex items-center gap-sm">
+                        
+                        <span className="font-semibold">South Soy Sector</span>
+                      </div>
+                    </td>
+                    <td className="px-5 py-m3">Soybeans</td>
+                    <td className="px-5 py-m3">Emergence</td>
+                    <td className="px-5 py-m3">
+                      <span className="px-2 py-1 bg-secondary-container/30 text-on-secondary-container rounded-full text-caption font-bold border border-secondary/20">
+                        Active
+                      </span>
+                    </td>
+                    <td className="px-5 py-m3 text-right">
+                      <button className="text-primary hover:bg-primary/10 p-xs rounded-full transition-all">
+                        <Eye className="material-symbols-outlined">
+                          visibility
+                        </Eye>
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
         </div>
-
-        <div className="rounded-2xl border border-outline-variant bg-surface-container-lowest p-6">
-          <h2 className="text-[1.5rem] font-semibold leading-[1.4] text-on-surface">Tasks</h2>
-          <p className="mt-3 text-base font-normal leading-[1.6] text-on-surface-variant">
-            Drop task updates, reminders, or reporting tools here.
-          </p>
-        </div>
-      </section>
+      </main>
     </RoleDashboardLayout>
-  )
+  );
 }
-
