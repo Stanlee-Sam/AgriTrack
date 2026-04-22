@@ -1,0 +1,523 @@
+import {
+  ChevronLeft,
+  ChevronRight,
+  Droplet,
+  Edit,
+  ListFilter,
+  Plus,
+  SortDesc,
+  X,
+} from "lucide-react";
+import RoleDashboardLayout from "../../components/layout/RoleDashboardLayout";
+import { navigationByRole } from "../../components/layout/navigation";
+import { CircleCheck, TriangleAlert } from "lucide-react";
+import { useState } from "react";
+
+export default function Fields() {
+  const [isOpen, setIsOpen] = useState(false);
+  const handleLogout = () => {
+    window.alert("Logout action goes here.");
+  };
+
+  const modalOpen = () => {
+    setIsOpen(!isOpen);
+  };
+
+  return (
+    <RoleDashboardLayout
+      roleLabel="Admin"
+      avatarName="Amina Admin"
+      navItems={navigationByRole.admin}
+      onLogout={handleLogout}
+    >
+      <main className="min-h-[calc(100vh-64px)]">
+        <header className="flex flex-col gap-3 md:flex-row md:justify-between md:items-center mb-4">
+          <div className="flex flex-col gap-3">
+            <h1 className="font-bold text-3xl text-on-surface">Fields</h1>
+            <p className="text-body-md text-on-surface-variant max-w-2xl">
+              Monitor real-time field performance, irrigation status, and crop
+              health across your entire operational footprint.
+            </p>
+          </div>
+          <button
+            onClick={modalOpen}
+            className="bg-primary text-on-primary px-5 py-3 rounded-lg font-bold flex flex-row items-center justify-center gap-2 hover:bg-[#0a3d2a] transition-colors shadow-sm"
+          >
+            <Plus
+              className="material-symbols-outlined text-[20px]"
+              data-icon="add"
+            />
+            Add New Field
+          </button>
+        </header>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-5 mb-4">
+          <div className="bg-white p-5 rounded-lg shadow-ambient">
+            <p className="text-bold text-outline mb-1 uppercase tracking-wider">
+              Total Area
+            </p>
+            <div className="flex items-baseline gap-2">
+              <span className="text-3xl font-bold text-on-surface">1,240</span>
+              <span className="text-body-md text-outline">Acres</span>
+            </div>
+          </div>
+          <div className="bg-white p-5 rounded-lg shadow-ambient">
+            <p className="text-bold text-outline mb-1 uppercase tracking-wider">
+              Active Crops
+            </p>
+            <div className="flex items-baseline gap-2">
+              <span className="text-3xl font-bold text-on-surface">8</span>
+              <span className="text-body-md text-outline">Varieties</span>
+            </div>
+          </div>
+          <div className="bg-white p-5 rounded-lg shadow-ambient">
+            <p className="text-bold text-outline mb-1 uppercase tracking-wider">
+              Irrigation Level
+            </p>
+            <div className="flex items-baseline gap-2">
+              <span className="text-3xl font-bold text-secondary">94%</span>
+              <Droplet
+                className="material-symbols-outlined text-secondary text-sm"
+                data-icon="water_drop"
+              >
+                water_drop
+              </Droplet>
+            </div>
+          </div>
+          <div className="bg-white p-5 rounded-lg shadow-ambient">
+            <p className="text-bold text-outline mb-1 uppercase tracking-wider">
+              Field Agents
+            </p>
+            <div className="flex items-baseline gap-2">
+              <span className="text-3xl font-bold text-on-surface">12</span>
+              <span className="text-body-md text-outline">On-site</span>
+            </div>
+          </div>
+        </div>
+        <div className="bg-white rounded-xl shadow-ambient overflow-hidden">
+          <div className="p-5 border-b border-outline-variant flex justify-between items-center bg-zinc-50/30">
+            <div className="flex gap-4">
+              <button className="px-4 py-2 bg-white border border-outline-variant rounded-lg text-label-md flex items-center gap-2 hover:bg-zinc-50 transition-colors">
+                <ListFilter
+                  className="material-symbols-outlined text-[18px]"
+                  data-icon="filter_list"
+                >
+                  filter_list
+                </ListFilter>
+                Filter
+              </button>
+              <button className="px-4 py-2 bg-white border border-outline-variant rounded-lg text-label-md flex items-center gap-2 hover:bg-zinc-50 transition-colors">
+                <SortDesc
+                  className="material-symbols-outlined text-[18px]"
+                  data-icon="sort"
+                >
+                  sort
+                </SortDesc>
+                Sort
+              </button>
+            </div>
+            <div className="font-bold text-outline">
+              Showing 24 active fields
+            </div>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-zinc-50/50">
+                  <th className="px-3 py-4 font-label-md text-outline text-[12px] uppercase tracking-wider">
+                    Field Name
+                  </th>
+                  <th className="px-3 py-4 font-label-md text-outline text-[12px] uppercase tracking-wider">
+                    Crop Type
+                  </th>
+                  <th className="px-3 py-4 font-label-md text-outline text-[12px] uppercase tracking-wider">
+                    Planting Date
+                  </th>
+                  <th className="px-3 py-4 font-label-md text-outline text-[12px] uppercase tracking-wider">
+                    Current Stage
+                  </th>
+                  <th className="px-3 py-4 font-label-md text-outline text-[12px] uppercase tracking-wider">
+                    Assigned Agent
+                  </th>
+                  <th className="px-3 py-4 font-label-md text-outline text-[12px] uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th className="px-3 py-4 font-label-md text-outline text-[12px] uppercase tracking-wider text-right">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-outline-variant">
+                <tr className="table-row-hover transition-colors">
+                  <td className="px-4 py-4">
+                    <div className="flex items-center gap-3">
+                      <div>
+                        <div className="font-label-md text-on-surface">
+                          North Plateau A1
+                        </div>
+                        <div className="text-caption text-outline">
+                          120 Acres • Soil Type: Loamy
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-gutter py-4 text-body-md text-on-surface-variant">
+                    Organic Corn
+                  </td>
+                  <td className="px-gutter py-4 text-body-md text-on-surface-variant">
+                    Mar 12, 2024
+                  </td>
+                  <td className="px-gutter py-4">
+                    <div className="w-full bg-zinc-100 rounded-full h-2 mb-1 max-w-[120px]">
+                      <div className="bg-primary h-2 rounded-full w-3/4"></div>
+                    </div>
+                    <span className="text-caption text-primary font-semibold">
+                      Tasseling Stage
+                    </span>
+                  </td>
+                  <td className="px-gutter py-4">
+                    <span className="text-body-md">David Miller</span>
+                  </td>
+                  <td className="px-gutter py-4">
+                    <span className="px-3 py-1 bg-secondary-fixed text-on-secondary-fixed-variant rounded-full text-caption font-bold">
+                      Optimal
+                    </span>
+                  </td>
+                  <td className="px-4 py-4 text-right">
+                    <button className="p-2 hover:bg-zinc-200 rounded-lg transition-colors text-outline">
+                      <Edit
+                        className="material-symbols-outlined"
+                        data-icon="edit"
+                      >
+                        edit
+                      </Edit>
+                    </button>
+                  </td>
+                </tr>
+                <tr className="table-row-hover transition-colors">
+                  <td className="px-4 py-4">
+                    <div className="flex items-center gap-3">
+                      <div>
+                        <div className="font-label-md text-on-surface">
+                          East Valley B4
+                        </div>
+                        <div className="text-caption text-outline">
+                          85 Acres • Soil Type: Clay
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-gutter py-4 text-body-md text-on-surface-variant">
+                    Winter Wheat
+                  </td>
+                  <td className="px-gutter py-4 text-body-md text-on-surface-variant">
+                    Feb 28, 2024
+                  </td>
+                  <td className="px-gutter py-4">
+                    <div className="w-full bg-zinc-100 rounded-full h-2 mb-1 max-w-[120px]">
+                      <div className="bg-primary h-2 rounded-full w-full"></div>
+                    </div>
+                    <span className="text-caption text-primary font-semibold">
+                      Ripening
+                    </span>
+                  </td>
+                  <td className="px-gutter py-4">
+                    <span className="text-body-md">Sarah Jenkins</span>
+                  </td>
+                  <td className="px-gutter py-4">
+                    <span className="px-3 py-1 bg-tertiary-fixed text-on-tertiary-fixed-variant rounded-full text-caption font-bold">
+                      In-Review
+                    </span>
+                  </td>
+                  <td className="px-4 py-4 text-right">
+                    <button className="p-2 hover:bg-zinc-200 rounded-lg transition-colors text-outline">
+                      <Edit
+                        className="material-symbols-outlined"
+                        data-icon="edit"
+                      >
+                        edit
+                      </Edit>
+                    </button>
+                  </td>
+                </tr>
+                <tr className="table-row-hover transition-colors">
+                  <td className="px-4 py-4">
+                    <div className="flex items-center gap-3">
+                      <div>
+                        <div className="font-label-md text-on-surface">
+                          South Ridge G2
+                        </div>
+                        <div className="text-caption text-outline">
+                          210 Acres • Soil Type: Sandy
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-gutter py-4 text-body-md text-on-surface-variant">
+                    Soybeans
+                  </td>
+                  <td className="px-gutter py-4 text-body-md text-on-surface-variant">
+                    Apr 05, 2024
+                  </td>
+                  <td className="px-gutter py-4">
+                    <div className="w-full bg-zinc-100 rounded-full h-2 mb-1 max-w-[120px]">
+                      <div className="bg-primary h-2 rounded-full w-1/4"></div>
+                    </div>
+                    <span className="text-caption text-primary font-semibold">
+                      Germination
+                    </span>
+                  </td>
+                  <td className="px-gutter py-4">
+                    <span className="text-body-md">Robert Chen</span>
+                  </td>
+                  <td className="px-gutter py-4">
+                    <span className="px-3 py-1 bg-error-container text-on-error-container rounded-full text-caption font-bold">
+                      Needs Irrigation
+                    </span>
+                  </td>
+                  <td className="px-4 py-4 text-right">
+                    <button className="p-2 hover:bg-zinc-200 rounded-lg transition-colors text-outline">
+                      <Edit
+                        className="material-symbols-outlined"
+                        data-icon="edit"
+                      >
+                        edit
+                      </Edit>
+                    </button>
+                  </td>
+                </tr>
+                <tr className="table-row-hover transition-colors">
+                  <td className="px-4 py-4">
+                    <div className="flex items-center gap-3">
+                      <div>
+                        <div className="font-label-md text-on-surface">
+                          West Gate Orchard
+                        </div>
+                        <div className="text-caption text-outline">
+                          45 Acres • Soil Type: Rich Silty
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-gutter py-4 text-body-md text-on-surface-variant">
+                    Almonds
+                  </td>
+                  <td className="px-gutter py-4 text-body-md text-on-surface-variant">
+                    Jan 15, 2024
+                  </td>
+                  <td className="px-gutter py-4">
+                    <div className="w-full bg-zinc-100 rounded-full h-2 mb-1 max-w-[120px]">
+                      <div className="bg-primary h-2 rounded-full w-2/3"></div>
+                    </div>
+                    <span className="text-caption text-primary font-semibold">
+                      Nut Development
+                    </span>
+                  </td>
+                  <td className="px-gutter py-4">
+                    <span className="text-body-md">Elena Rodriguez</span>
+                  </td>
+                  <td className="px-gutter py-4">
+                    <span className="px-3 py-1 bg-secondary-fixed text-on-secondary-fixed-variant rounded-full text-caption font-bold">
+                      Optimal
+                    </span>
+                  </td>
+                  <td className="px-4 py-4 text-right">
+                    <button className="p-2 hover:bg-zinc-200 rounded-lg transition-colors text-outline">
+                      <Edit
+                        className="material-symbols-outlined"
+                        data-icon="edit"
+                      >
+                        edit
+                      </Edit>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div className="p-5 border-t border-outline-variant bg-zinc-50/30 flex justify-between items-center">
+            <div className="flex items-center gap-2">
+              <button className="p-2 border border-outline-variant rounded-lg bg-white disabled:opacity-50">
+                <ChevronLeft
+                  className="material-symbols-outlined"
+                  data-icon="chevron_left"
+                >
+                  chevron_left
+                </ChevronLeft>
+              </button>
+              <div className="flex items-center gap-1">
+                <button className="w-8 h-8 rounded-lg bg-primary text-on-primary font-bold text-caption">
+                  1
+                </button>
+                <button className="w-8 h-8 rounded-lg hover:bg-zinc-200 text-on-surface text-caption">
+                  2
+                </button>
+                <button className="w-8 h-8 rounded-lg hover:bg-zinc-200 text-on-surface text-caption">
+                  3
+                </button>
+              </div>
+              <button className="p-2 border border-outline-variant rounded-lg bg-white">
+                <ChevronRight
+                  className="material-symbols-outlined"
+                  data-icon="chevron_right"
+                >
+                  chevron_right
+                </ChevronRight>
+              </button>
+            </div>
+            <div className="text-[12px] text-outline">Page 1 of 6</div>
+          </div>
+        </div>
+        <div className="mt-5 grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div className="bg-white p-5 rounded-xl shadow-ambient border border-emerald-50">
+            <h3 className="font-h3 text-2xl text-primary mb-2">
+              Active Alerts
+            </h3>
+            <ul className="space-y-4">
+              <li className="flex items-center gap-4 p-3 bg-error-container/20 rounded-lg border-l-4 border-error">
+                <TriangleAlert
+                  className="material-symbols-outlined text-error"
+                  data-icon="warning"
+                >
+                  warning
+                </TriangleAlert>
+                <div>
+                  <p className="font-label-md text-[18px] text-on-surface">
+                    Low Moisture: South Ridge G2
+                  </p>
+                  <p className="text-[15px] text-on-surface-variant">
+                    Sensor readings below 15% threshold. Manual irrigation
+                    override suggested.
+                  </p>
+                </div>
+              </li>
+              <li className="flex items-center gap-4 p-3 bg-error-container/20 rounded-lg border-l-4 border-error">
+                <CircleCheck
+                  className="material-symbols-outlined text-secondary"
+                  data-icon="check_circle"
+                >
+                  check_circle
+                </CircleCheck>
+                <div>
+                  <p className="font-label-md text-[18px] text-on-surface">
+                    Harvest Ready: East Valley B4
+                  </p>
+                  <p className="text-[15px] text-on-surface-variant">
+                    Maturity index reached. Scheduling harvesting equipment for
+                    Thursday.
+                  </p>
+                </div>
+              </li>
+            </ul>
+          </div>
+          <div className="bg-primary-container p-5 rounded-xl shadow-ambient relative overflow-hidden">
+            <div className="relative z-10">
+              <h3 className="font-h3 text-2xl text-white mb-3">
+                Field Insights
+              </h3>
+              <p className="text-body-md text-primary-fixed mb-5">
+                Predictive models suggest an 18% increase in yield for North
+                Plateau A1 based on recent soil enrichment protocols.
+              </p>
+              <button className="bg-white text-primary px-4 py-2 rounded-lg font-label-md hover:bg-zinc-50 transition-all">
+                View Details Analysis
+              </button>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      {isOpen && (
+        <>
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-md">
+            <div className="relative bg-white w-full max-w-lg rounded-2xl custom-shadow-lvl2 overflow-hidden flex flex-col">
+              <div className="px-8 py-6 border-b border-zinc-100 flex items-center justify-between bg-emerald-50/10">
+                <div>
+                  <h3 className="text-2xl font-bold text-primary">
+                    Add New Field
+                  </h3>
+                  <p className="text-sm text-zinc-500">
+                    Enter plot details for new cultivation
+                  </p>
+                </div>
+                <button className="text-zinc-400 hover:text-zinc-600 cursor-pointer">
+                  <X className="material-symbols-outlined" data-icon="close">
+                    close
+                  </X>
+                </button>
+              </div>
+              <div className="p-8 space-y-6">
+                <div className="space-y-2">
+                  <label className="font-semibold text-neutral">
+                    Field Name
+                  </label>
+                  <input
+                    className="w-full bg-[#F1F3F5] border-zinc-200 rounded-lg px-4 py-2.5 focus:ring-primary/10 focus:border-primary focus:bg-white transition-all outline-none"
+                    placeholder="e.g. West Coast Hill Plot 3"
+                    type="text"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="font-semibold text-neutral">
+                      Crop Type
+                    </label>
+                    <select className="w-full bg-[#F1F3F5] border-zinc-200 rounded-lg px-4 py-2.5 focus:ring-primary/10 focus:border-primary focus:bg-white transition-all outline-none appearance-none">
+                      <option>Wheat</option>
+                      <option>Corn</option>
+                      <option>Soybeans</option>
+                      <option>Rice</option>
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="font-semibold text-neutral">
+                      Planting Date
+                    </label>
+                    <input
+                      className="w-full bg-[#F1F3F5] border-zinc-200 rounded-lg px-4 py-2.5 focus:ring-primary/10 focus:border-primary focus:bg-white transition-all outline-none"
+                      type="date"
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="font-semibold text-neutral">
+                      Current Stage
+                    </label>
+                    <select className="w-full bg-[#F1F3F5] border-zinc-200 rounded-lg px-4 py-2.5 focus:ring-primary/10 focus:border-primary focus:bg-white transition-all outline-none appearance-none">
+                      <option>Planted</option>
+                      <option>Growing</option>
+                      <option>Ready</option>
+                      <option>Harvested</option>
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="font-semibold text-neutral">
+                      Assign Agent
+                    </label>
+                    <select className="w-full bg-[#F1F3F5] border-zinc-200 rounded-lg px-4 py-2.5 focus:ring-primary/10 focus:border-primary focus:bg-white transition-all outline-none appearance-none">
+                      <option>Marcus Chen</option>
+                      <option>Sarah Jenkins</option>
+                      <option>David Miller</option>
+                      <option>Unassigned</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div className="px-8 py-6 bg-zinc-50 border-t border-zinc-100 flex justify-end gap-3">
+                <button
+                  onClick={modalOpen}
+                  className="px-6 py-2.5 text-zinc-600 font-label-md hover:bg-zinc-200 rounded-lg transition-colors"
+                >
+                  Cancel
+                </button>
+                <button className="bg-primary hover:bg-emerald-900 text-white px-8 py-2.5 rounded-lg font-label-md transition-colors custom-shadow-lvl1">
+                  Save Field
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+    </RoleDashboardLayout>
+  );
+}

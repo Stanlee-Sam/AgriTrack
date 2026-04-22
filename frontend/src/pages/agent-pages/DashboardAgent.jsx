@@ -1,10 +1,7 @@
-import { useState } from 'react'
 import RoleDashboardLayout from '../../components/layout/RoleDashboardLayout'
 import { navigationByRole } from '../../components/layout/navigation'
 
 export default function DashboardAgent() {
-  const [activeItem, setActiveItem] = useState('dashboard')
-
   const handleLogout = () => {
     window.alert('Logout action goes here.')
   }
@@ -14,8 +11,6 @@ export default function DashboardAgent() {
       roleLabel="Agent"
       avatarName="Daniel Agent"
       navItems={navigationByRole.agent}
-      activeItem={activeItem}
-      onSelect={setActiveItem}
       onLogout={handleLogout}
     >
       <section className="rounded-3xl border border-outline-variant bg-surface-container-lowest p-6 shadow-[0_12px_30px_rgba(45,106,79,0.08)] lg:p-8">

@@ -1,20 +1,41 @@
 import { Tractor } from "lucide-react";
+import { NavLink } from "react-router-dom";
 
 const baseItemClassName =
   "flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-semibold transition-colors";
 
-function SidebarNavItem({ item, isActive, onSelect }) {
+function getItemClassName(isActive) {
+  return `${baseItemClassName} w-full ${
+    isActive
+      ? "bg-primary text-on-primary shadow-sm"
+      : "text-neutral hover:bg-surface-container-low hover:text-primary"
+  }`;
+}
+
+function SidebarNavItem({ item, isActive, onClick, onNavigate }) {
   const Icon = item.icon;
+
+  if (item.path && !onClick) {
+    return (
+      <NavLink
+        to={item.path}
+        end
+        onClick={onNavigate}
+        className={({ isActive: isCurrentRoute }) =>
+          getItemClassName(isCurrentRoute)
+        }
+      >
+        <Icon className="h-5 w-5 shrink-0" />
+        <span>{item.label}</span>
+      </NavLink>
+    );
+  }
 
   return (
     <button
       type="button"
-      onClick={() => onSelect(item.key)}
-      className={`${baseItemClassName} w-full ${
-        isActive
-          ? "bg-primary text-on-primary shadow-sm"
-          : "text-neutral hover:bg-surface-container-low hover:text-primary"
-      }`}
+      onClick={onClick}
+      className={getItemClassName(isActive)}
     >
       <Icon className="h-5 w-5 shrink-0" />
       <span>{item.label}</span>
@@ -22,7 +43,14 @@ function SidebarNavItem({ item, isActive, onSelect }) {
   );
 }
 
-function SidebarContent({ roleLabel, items, activeItem, onSelect, onLogout }) {
+function SidebarContent({
+  roleLabel,
+  items,
+  activeItem,
+  onSelect,
+  onLogout,
+  onNavigate,
+}) {
   return (
     <div className="flex h-full flex-col bg-surface-container-lowest w-full">
       <div className="border-b border-outline-variant px-6 py-6 flex flex-row items-center gap-3 w-full">
@@ -41,7 +69,14 @@ function SidebarContent({ roleLabel, items, activeItem, onSelect, onLogout }) {
             key={item.key}
             item={item}
             isActive={activeItem === item.key}
-            onSelect={item.key === "logout" ? onLogout : onSelect}
+            onClick={
+              item.key === "logout"
+                ? onLogout
+                : onSelect
+                  ? () => onSelect(item.key)
+                  : undefined
+            }
+            onNavigate={onNavigate}
           />
         ))}
       </nav>
@@ -73,6 +108,7 @@ export default function Sidebar({
           activeItem={activeItem}
           onSelect={onSelect}
           onLogout={onLogout}
+          onNavigate={onClose}
         />
       </aside>
 
@@ -89,16 +125,15 @@ export default function Sidebar({
               roleLabel={roleLabel}
               items={items}
               activeItem={activeItem}
-              onSelect={(key) => {
-                if (key !== "logout") {
-                  onSelect(key);
-                  onClose();
-                }
-              }}
+              onSelect={onSelect ? (key) => {
+                onSelect(key);
+                onClose();
+              } : undefined}
               onLogout={() => {
                 onLogout();
                 onClose();
               }}
+              onNavigate={onClose}
             />
           </aside>
         </div>

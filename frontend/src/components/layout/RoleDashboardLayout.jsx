@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import Sidebar from './Sidebar'
 import TopNavbar from './TopNavbar'
 
@@ -11,9 +12,13 @@ export default function RoleDashboardLayout({
   onLogout,
   children,
 }) {
+  const location = useLocation()
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const activeNavItem =
-    navItems.find((item) => item.key === activeItem) ?? navItems[0]
+    navItems.find((item) => item.key === activeItem) ??
+    navItems.find((item) => item.path === location.pathname) ??
+    navItems.find((item) => item.path) ??
+    navItems[0]
 
   return (
     <div className="min-h-screen bg-background text-on-background">
