@@ -1,111 +1,210 @@
-:root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap");
+@import "tailwindcss";
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
+/* Tailwind v4 theme colors from frontend/DESIGN.md */
+@theme {
+  --color-surface: #f6f9ff;
+  --color-surface-dim: #d4dbe3;
+  --color-surface-bright: #f6f9ff;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #eef4fd;
+  --color-surface-container: #e8eef7;
+  --color-surface-container-high: #e2e9f1;
+  --color-surface-container-highest: #dce3ec;
+  --color-on-surface: #151c22;
+  --color-on-surface-variant: #495057;
+  --color-inverse-surface: #2a3138;
+  --color-inverse-on-surface: #ebf1fa;
+  --color-outline: #707973;
+  --color-outline-variant: #bfc9c1;
+  --color-surface-tint: #2c694e;
+  --color-primary: #2d6a4f;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #2d6a4f;
+  --color-on-primary-container: #a8e7c5;
+  --color-inverse-primary: #95d4b3;
+  --color-secondary: #74c69d;
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #a0f4c8;
+  --color-on-secondary-container: #19724f;
+  --color-tertiary: #1b4332;
+  --color-on-tertiary: #ffffff;
+  --color-tertiary-container: #3f6754;
+  --color-on-tertiary-container: #b8e3cb;
+  --color-neutral: #495057;
+  --color-error: #ba1a1a;
+  --color-on-error: #ffffff;
+  --color-error-container: #ffdad6;
+  --color-on-error-container: #93000a;
+  --color-primary-fixed: #b1f0ce;
+  --color-primary-fixed-dim: #95d4b3;
+  --color-on-primary-fixed: #002114;
+  --color-on-primary-fixed-variant: #0e5138;
+  --color-secondary-fixed: #a0f4c8;
+  --color-secondary-fixed-dim: #85d7ad;
+  --color-on-secondary-fixed: #002113;
+  --color-on-secondary-fixed-variant: #005236;
+  --color-tertiary-fixed: #c1ecd4;
+  --color-tertiary-fixed-dim: #a5d0b9;
+  --color-on-tertiary-fixed: #002114;
+  --color-on-tertiary-fixed-variant: #274e3d;
+  --color-background: #f6f9ff;
+  --color-on-background: #151c22;
+  --color-surface-variant: #dce3ec;
 
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  --font-sans: "Manrope", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 
-  @media (max-width: 1024px) {
-    font-size: 16px;
-  }
+  --text-display-1: 3rem;
+  --text-display-1--line-height: 1.2;
+  --text-display-1--letter-spacing: -0.02em;
+
+  --text-display-2: 2rem;
+  --text-display-2--line-height: 1.3;
+  --text-display-2--letter-spacing: -0.01em;
+
+  --text-display-3: 1.5rem;
+  --text-display-3--line-height: 1.4;
+  --text-display-3--letter-spacing: 0em;
+
+  --text-body-lg: 1.125rem;
+  --text-body-lg--line-height: 1.6;
+  --text-body-lg--letter-spacing: 0em;
+
+  --text-body-md: 1rem;
+  --text-body-md--line-height: 1.6;
+  --text-body-md--letter-spacing: 0em;
+
+  --text-label-md: 0.875rem;
+  --text-label-md--line-height: 1.2;
+  --text-label-md--letter-spacing: 0.02em;
+
+  --text-caption: 0.75rem;
+  --text-caption--line-height: 1.2;
+  --text-caption--letter-spacing: 0em;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
+:root {
+  --background: #f6f9ff;
+  --foreground: #151c22;
+  --primary : #2d6a4f;
+  --secondary : #74c69d;
+  --tertiary : #1b4332;
+  --neutral : #495057;
+  --card: #ffffff;
+  --card-foreground: #151c22;
+  --muted: #eef4fd;
+  --muted-foreground: #495057;
+  --border: #bfc9c1;
+  --input: #dce3ec;
+  --ring: #2d6a4f;
 
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
+  /* Aliases for the current starter App.css */
+  --accent: #2d6a4f;
+  --accent-bg: #2d6a4f;
+  --accent-border: #74c69d;
+  --text-h: #495057;
+  --social-bg: #eef4fd;
+
+  --font-family-base: "Manrope", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-weight-body: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --text-h1-size: 3rem;
+  --text-h1-line-height: 1.2;
+  --text-h1-letter-spacing: -0.02em;
+
+  --text-h2-size: 2rem;
+  --text-h2-line-height: 1.3;
+  --text-h2-letter-spacing: -0.01em;
+
+  --text-h3-size: 1.5rem;
+  --text-h3-line-height: 1.4;
+  --text-h3-letter-spacing: 0em;
+
+  --text-body-lg-size: 1.125rem;
+  --text-body-lg-line-height: 1.6;
+  --text-body-lg-letter-spacing: 0em;
+
+  --text-body-md-size: 1rem;
+  --text-body-md-line-height: 1.6;
+  --text-body-md-letter-spacing: 0em;
+
+  --text-label-md-size: 0.875rem;
+  --text-label-md-line-height: 1.2;
+  --text-label-md-letter-spacing: 0.02em;
+
+  --text-caption-size: 0.75rem;
+  --text-caption-line-height: 1.2;
+  --text-caption-letter-spacing: 0em;
+}
+
+html {
+  background-color: var(--background);
 }
 
 body {
-  margin: 0;
-}
-
-#root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
+  font-family: var(--font-family-base);
+  background-color: var(--background);
+  color: var(--foreground);
+  font-size: var(--text-body-md-size);
+  line-height: var(--text-body-md-line-height);
+  font-weight: var(--font-weight-body);
+  letter-spacing: var(--text-body-md-letter-spacing);
 }
 
 h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
+.text-h1 {
+  font-family: var(--font-family-base);
+  font-size: var(--text-h1-size);
+  line-height: var(--text-h1-line-height);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--text-h1-letter-spacing);
 }
 
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
-}
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
-}
-p {
-  margin: 0;
+h2,
+.text-h2 {
+  font-family: var(--font-family-base);
+  font-size: var(--text-h2-size);
+  line-height: var(--text-h2-line-height);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--text-h2-letter-spacing);
 }
 
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
+h3,
+.text-h3 {
+  font-family: var(--font-family-base);
+  font-size: var(--text-h3-size);
+  line-height: var(--text-h3-line-height);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--text-h3-letter-spacing);
 }
 
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
+.text-body-lg {
+  font-size: var(--text-body-lg-size);
+  line-height: var(--text-body-lg-line-height);
+  font-weight: var(--font-weight-body);
+  letter-spacing: var(--text-body-lg-letter-spacing);
+}
+
+.text-body-md {
+  font-size: var(--text-body-md-size);
+  line-height: var(--text-body-md-line-height);
+  font-weight: var(--font-weight-body);
+  letter-spacing: var(--text-body-md-letter-spacing);
+}
+
+.text-label-md {
+  font-size: var(--text-label-md-size);
+  line-height: var(--text-label-md-line-height);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--text-label-md-letter-spacing);
+}
+
+.text-caption {
+  font-size: var(--text-caption-size);
+  line-height: var(--text-caption-line-height);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--text-caption-letter-spacing);
 }
