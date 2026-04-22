@@ -29,11 +29,11 @@ function StatCard({ label, value, tone = 'default' }) {
 
   return (
     <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-6 shadow-[0_12px_30px_rgba(45,106,79,0.08)]">
-      <p className="text-caption uppercase tracking-[0.14em] text-on-surface-variant">
+      <p className="text-xs font-medium leading-[1.2] uppercase tracking-[0.14em] text-on-surface-variant">
         {label}
       </p>
       <div className={`mt-4 inline-flex rounded-full px-4 py-2 ${toneClassName}`}>
-        <span className="text-h3">{value}</span>
+        <span className="text-[1.5rem] font-semibold leading-[1.4]">{value}</span>
       </div>
     </div>
   )
@@ -72,13 +72,13 @@ export default function DashboardPreview() {
       <section className="rounded-3xl bg-surface-container-lowest p-6 shadow-[0_12px_30px_rgba(45,106,79,0.08)] lg:p-8">
         <div className="flex flex-col gap-6 xl:flex-row xl:items-start xl:justify-between">
           <div className="max-w-3xl">
-            <p className="text-caption uppercase tracking-[0.14em] text-secondary">
+            <p className="text-xs font-medium leading-[1.2] uppercase tracking-[0.14em] text-secondary">
               AgriTrack dashboard
             </p>
-            <h1 className="mt-3 text-h1 text-on-surface">
+            <h1 className="mt-3 text-[3rem] font-bold leading-[1.2] tracking-[-0.02em] text-on-surface">
               {currentRoleCopy.heroTitle}
             </h1>
-            <p className="mt-4 max-w-2xl text-body-lg text-neutral">
+            <p className="mt-4 max-w-2xl text-[1.125rem] font-normal leading-[1.6] text-neutral">
               {currentRoleCopy.heroDescription}
             </p>
           </div>
@@ -87,7 +87,7 @@ export default function DashboardPreview() {
             <button
               type="button"
               onClick={() => setRole('admin')}
-              className={`rounded-full px-5 py-3 text-label-md transition-colors ${
+              className={`rounded-full px-5 py-3 text-sm font-semibold leading-[1.2] tracking-[0.02em] transition-colors ${
                 role === 'admin'
                   ? 'bg-primary text-on-primary'
                   : 'bg-surface-container-low text-on-surface hover:bg-secondary/20'
@@ -98,7 +98,7 @@ export default function DashboardPreview() {
             <button
               type="button"
               onClick={() => setRole('agent')}
-              className={`rounded-full px-5 py-3 text-label-md transition-colors ${
+              className={`rounded-full px-5 py-3 text-sm font-semibold leading-[1.2] tracking-[0.02em] transition-colors ${
                 role === 'agent'
                   ? 'bg-primary text-on-primary'
                   : 'bg-surface-container-low text-on-surface hover:bg-secondary/20'
@@ -125,14 +125,14 @@ export default function DashboardPreview() {
         <div className="rounded-3xl border border-outline-variant bg-surface-container-lowest p-6 shadow-[0_12px_30px_rgba(45,106,79,0.08)]">
           <div className="flex items-center justify-between gap-4">
             <div>
-              <p className="text-caption uppercase tracking-[0.14em] text-on-surface-variant">
+              <p className="text-xs font-medium leading-[1.2] uppercase tracking-[0.14em] text-on-surface-variant">
                 Navigation preview
               </p>
-              <h2 className="mt-2 text-h2 text-on-surface">
+              <h2 className="mt-2 text-[2rem] font-semibold leading-[1.3] tracking-[-0.01em] text-on-surface">
                 Reusable role-based sidebar
               </h2>
             </div>
-            <span className="rounded-full bg-secondary/20 px-4 py-2 text-label-md text-tertiary">
+            <span className="rounded-full bg-secondary/20 px-4 py-2 text-sm font-semibold leading-[1.2] tracking-[0.02em] text-tertiary">
               {currentRoleCopy.roleLabel}
             </span>
           </div>
@@ -145,9 +145,9 @@ export default function DashboardPreview() {
               >
                 <div className="flex items-center gap-3">
                   <item.icon className="h-5 w-5 text-primary" />
-                  <span className="text-label-md text-on-surface">{item.label}</span>
+                  <span className="text-sm font-semibold leading-[1.2] tracking-[0.02em] text-on-surface">{item.label}</span>
                 </div>
-                <span className="text-caption text-on-surface-variant">
+                <span className="text-xs font-medium leading-[1.2] text-on-surface-variant">
                   {item.key === 'logout' ? 'Action' : 'Page'}
                 </span>
               </div>
@@ -156,10 +156,10 @@ export default function DashboardPreview() {
         </div>
 
         <div className="rounded-3xl border border-outline-variant bg-surface-container-lowest p-6 shadow-[0_12px_30px_rgba(45,106,79,0.08)]">
-          <p className="text-caption uppercase tracking-[0.14em] text-on-surface-variant">
+          <p className="text-xs font-medium leading-[1.2] uppercase tracking-[0.14em] text-on-surface-variant">
             Top bar
           </p>
-          <h2 className="mt-2 text-h2 text-on-surface">
+          <h2 className="mt-2 text-[2rem] font-semibold leading-[1.3] tracking-[-0.01em] text-on-surface">
             Avatar and quick actions
           </h2>
           <div className="mt-6 rounded-3xl bg-surface p-5">
@@ -173,10 +173,10 @@ export default function DashboardPreview() {
                   .toUpperCase()}
               </div>
               <div>
-                <p className="text-label-md text-on-surface">
+                <p className="text-sm font-semibold leading-[1.2] tracking-[0.02em] text-on-surface">
                   {currentRoleCopy.avatarName}
                 </p>
-                <p className="text-caption text-on-surface-variant">
+                <p className="text-xs font-medium leading-[1.2] text-on-surface-variant">
                   {currentRoleCopy.roleLabel} account
                 </p>
               </div>
@@ -185,7 +185,7 @@ export default function DashboardPreview() {
             <button
               type="button"
               onClick={handleLogout}
-              className="mt-5 inline-flex items-center rounded-full bg-tertiary px-5 py-3 text-label-md text-on-tertiary transition-colors hover:bg-primary"
+              className="mt-5 inline-flex items-center rounded-full bg-tertiary px-5 py-3 text-sm font-semibold leading-[1.2] tracking-[0.02em] text-on-tertiary transition-colors hover:bg-primary"
             >
               Logout
             </button>
@@ -195,3 +195,4 @@ export default function DashboardPreview() {
     </RoleDashboardLayout>
   )
 }
+

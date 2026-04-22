@@ -1,43 +1,47 @@
+import { Tractor } from "lucide-react";
+
 const baseItemClassName =
-  'flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-semibold transition-colors'
+  "flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-semibold transition-colors";
 
 function SidebarNavItem({ item, isActive, onSelect }) {
-  const Icon = item.icon
+  const Icon = item.icon;
 
   return (
     <button
       type="button"
       onClick={() => onSelect(item.key)}
-      className={`${baseItemClassName} ${
+      className={`${baseItemClassName} w-full ${
         isActive
-          ? 'bg-primary text-on-primary shadow-sm'
-          : 'text-neutral hover:bg-surface-container-low hover:text-primary'
+          ? "bg-primary text-on-primary shadow-sm"
+          : "text-neutral hover:bg-surface-container-low hover:text-primary"
       }`}
     >
       <Icon className="h-5 w-5 shrink-0" />
       <span>{item.label}</span>
     </button>
-  )
+  );
 }
 
 function SidebarContent({ roleLabel, items, activeItem, onSelect, onLogout }) {
   return (
-    <div className="flex h-full flex-col bg-surface-container-lowest">
-      <div className="border-b border-outline-variant px-6 py-6">
-        <p className="text-caption uppercase tracking-[0.14em] text-on-surface-variant">
-          AgriTrack
-        </p>
-        <h1 className="mt-2 text-h3 text-on-surface">{roleLabel} Portal</h1>
-        <p className="mt-1 text-sm text-neutral">Farm operations at a glance</p>
+    <div className="flex h-full flex-col bg-surface-container-lowest w-full">
+      <div className="border-b border-outline-variant px-6 py-6 flex flex-row items-center gap-3 w-full">
+        <div className="bg-primary rounded-lg p-2">
+          <Tractor className="text-white text-2xl" />
+        </div>
+        <div>
+          <p className="text-2xl text-primary font-extrabold">AgriTrack</p>
+          <p className="text-lg text-neutral font-semibold">{roleLabel} Portal</p>
+        </div>
       </div>
 
-      <nav className="flex-1 space-y-2 px-4 py-6">
+      <nav className="flex-1 space-y-2 px-4 py-6 w-full">
         {items.map((item) => (
           <SidebarNavItem
             key={item.key}
             item={item}
             isActive={activeItem === item.key}
-            onSelect={item.key === 'logout' ? onLogout : onSelect}
+            onSelect={item.key === "logout" ? onLogout : onSelect}
           />
         ))}
       </nav>
@@ -48,7 +52,7 @@ function SidebarContent({ roleLabel, items, activeItem, onSelect, onLogout }) {
         </p>
       </div>
     </div>
-  )
+  );
 }
 
 export default function Sidebar({
@@ -86,19 +90,19 @@ export default function Sidebar({
               items={items}
               activeItem={activeItem}
               onSelect={(key) => {
-                if (key !== 'logout') {
-                  onSelect(key)
-                  onClose()
+                if (key !== "logout") {
+                  onSelect(key);
+                  onClose();
                 }
               }}
               onLogout={() => {
-                onLogout()
-                onClose()
+                onLogout();
+                onClose();
               }}
             />
           </aside>
         </div>
       ) : null}
     </>
-  )
+  );
 }

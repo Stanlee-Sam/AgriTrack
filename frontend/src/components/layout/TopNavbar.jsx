@@ -27,10 +27,10 @@ export default function TopNavbar({
         </button>
 
         <div>
-          <p className="text-caption uppercase tracking-[0.14em] text-on-surface-variant">
+          <p className="text-[8px] md:text-[12px] font-medium leading-[1.2] uppercase tracking-[0.14em] text-on-surface-variant">
             {roleLabel} workspace
           </p>
-          <h2 className="text-h3 text-on-surface">{activeLabel}</h2>
+          <h2 className="text-[1.5rem] font-bold leading-[1.4] text-on-surface">{activeLabel}</h2>
         </div>
       </div>
 
@@ -40,8 +40,8 @@ export default function TopNavbar({
             {initials}
           </div>
           <div className="pr-2">
-            <p className="text-label-md text-on-surface">{avatarName}</p>
-            <p className="text-caption text-on-surface-variant">
+            <p className="text-sm font-semibold leading-[1.2] tracking-[0.02em] text-on-surface">{avatarName}</p>
+            <p className="text-xs font-medium leading-[1.2] text-on-surface-variant">
               {roleLabel} account
             </p>
           </div>
@@ -50,7 +50,7 @@ export default function TopNavbar({
         <button
           type="button"
           onClick={onLogout}
-          className="inline-flex items-center gap-2 rounded-full border border-outline-variant px-4 py-2 text-label-md text-on-surface transition-colors hover:border-secondary hover:bg-surface-container-low"
+          className="inline-flex items-center gap-2 rounded-full border border-outline-variant px-4 py-2 text-sm font-semibold leading-[1.2] tracking-[0.02em] text-on-surface transition-colors hover:border-secondary hover:bg-surface-container-low"
         >
           <LogoutIcon className="h-4 w-4" />
           <span className="hidden sm:inline">Logout</span>
@@ -63,3 +63,4 @@ export default function TopNavbar({
     </header>
   )
 }
+
