@@ -56,7 +56,8 @@ export default function DashboardAgent() {
                 </span>
               </div>
               <div>
-                <p className="text-3xl font-bold text-on-surface">12</p>
+                <p className="text-3xl font-bold text-on-surface">
+                  12</p>
                 <p className="font-semibold text-on-surface-variant">
                   Assigned Fields
                 </p>
