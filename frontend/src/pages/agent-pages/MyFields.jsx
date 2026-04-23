@@ -16,56 +16,64 @@ import {
 } from "lucide-react";
 import RoleDashboardLayout from "../../components/layout/RoleDashboardLayout";
 import { navigationByRole } from "../../components/layout/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 export default function MyFields() {
   const [isOpen, setIsOpen] = useState(false);
+  const [fields, setFields] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const agentId = localStorage.getItem("userId");
+  const [selectedFieldId, setSelectedFieldId] = useState("");
+  const [newStage, setNewStage] = useState("");
+  const [note, setNote] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-  const fields = [
-    {
-      id: 1,
-      name: "North Cornfield",
-      crop: "Corn",
-      cropType: "Hybrid Z-42",
-      icon: <Sprout />,
-      status: "growing",
-      attribute: "Moisture",
-      attributeValue: "68% Optimal",
-      datePlanted: "March 15, 2023",
-    },
-    {
-      id: 2,
-      name: "East Vineyard",
-      crop: "Grapes",
-      cropType: "Cabernet Sauvignon",
-      icon: <Flower />,
-      status: "Ready for harvest",
-      attribute: "Sugar Level",
-      attributeValue: "24.5 Brix",
-      datePlanted: "March 15, 2023",
-    },
-    {
-      id: 3,
-      name: "South Wheatfield",
-      crop: "Wheat",
-      cropType: "Winter Gold",
-      icon: <Sprout />,
-      status: "growing",
-      attribute: "Nitrogen Level",
-      attributeValue: "Stable",
-    },
-    {
-      id: 4,
-      name: "West Applefield",
-      crop: "Apples",
-      cropType: "Golden Delicious",
-      icon: <Droplet />,
-      status: "Irrigating",
-      attribute: "Water flow",
-      attributeValue: "Active",
-      datePlanted: "March 15, 2023",
-    },
-  ];
+  // const fields = [
+  //   {
+  //     id: 1,
+  //     name: "North Cornfield",
+  //     crop: "Corn",
+  //     cropType: "Hybrid Z-42",
+  //     icon: <Sprout />,
+  //     status: "growing",
+  //     attribute: "Moisture",
+  //     attributeValue: "68% Optimal",
+  //     datePlanted: "March 15, 2023",
+  //   },
+  //   {
+  //     id: 2,
+  //     name: "East Vineyard",
+  //     crop: "Grapes",
+  //     cropType: "Cabernet Sauvignon",
+  //     icon: <Flower />,
+  //     status: "Ready for harvest",
+  //     attribute: "Sugar Level",
+  //     attributeValue: "24.5 Brix",
+  //     datePlanted: "March 15, 2023",
+  //   },
+  //   {
+  //     id: 3,
+  //     name: "South Wheatfield",
+  //     crop: "Wheat",
+  //     cropType: "Winter Gold",
+  //     icon: <Sprout />,
+  //     status: "growing",
+  //     attribute: "Nitrogen Level",
+  //     attributeValue: "Stable",
+  //   },
+  //   {
+  //     id: 4,
+  //     name: "West Applefield",
+  //     crop: "Apples",
+  //     cropType: "Golden Delicious",
+  //     icon: <Droplet />,
+  //     status: "Irrigating",
+  //     attribute: "Water flow",
+  //     attributeValue: "Active",
+  //     datePlanted: "March 15, 2023",
+  //   },
+  // ];
 
   const statusStyles = {
     growing: "bg-secondary text-primary",
@@ -78,6 +86,62 @@ export default function MyFields() {
 
   const openModel = () => {
     setIsOpen(!isOpen);
+  };
+
+  useEffect(() => {
+    const fetchAssignedFields = () => {
+      setLoading(true);
+
+      try {
+        const response = axios.get(``);
+        setFields(response.data);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+  }, [agentId]);
+
+  const handleUpdateField = async (e) => {
+    e.preventDefault();
+
+    if (!selectedFieldId || !newStage || !note) return;
+
+    setSubmitting(true);
+    try {
+      await axios.post("http://localhost:5000/updates", {
+        fieldId: selectedFieldId,
+        newStage,
+        note,
+      });
+
+      alert("Field updated successfully");
+
+      const response = await axios.get(
+        `http://localhost:5000/fields/assigned-fields/${agentId}`,
+      );
+      setFields(response.data);
+
+      setSelectedFieldId("");
+      setNewStage("");
+      setNote("");
+    } catch (error) {
+      console.error(error);
+      alert("Failed to update field");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const getFieldStatusLabel = (field) => {
+    const plantedDate = new Date(field.plantingDate);
+    const today = new Date();
+    const days = (today - plantedDate) / (1000 * 60 * 60 * 24);
+
+    if (field.currentStage === "harvested") return "completed";
+    if (days > 30 && field.currentStage === "ready") return "at_risk";
+    return "active";
   };
 
   return (
@@ -126,14 +190,14 @@ export default function MyFields() {
             >
               <div className="flex justify-between items-start mb-4">
                 <div className="h-10 w-10 bg-emerald-50 rounded-lg flex items-center justify-center">
-                  <div className="material text-primary" data-icon="grass">
+                  {/* <div className="material text-primary" data-icon="grass">
                     {field.icon}
-                  </div>
+                  </div> */}
                 </div>
                 <div
                   className={`px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold uppercase tracking-wider ${statusStyles[field.status]}`}
                 >
-                  {field.status}
+                  {field.currentStage}
                 </div>
               </div>
               <div className="flex-1">
@@ -147,23 +211,24 @@ export default function MyFields() {
                   >
                     category
                   </Component>
-                  {field.crop} • {field.cropType}
+                  {/* {field.crop} • {field.cropType} */}
+                  {field.cropType}
                 </p>
                 <div className="space-y-2 mb-6">
                   <div className="flex justify-between text-[13px]">
                     <span className="text-on-surface-variant">Planted on</span>
                     <span className="font-semibold text-on-surface">
-                      {field.datePlanted}
+                      {new Date(field.plantingDate).toLocaleDateString()}
                     </span>
                   </div>
-                  <div className="flex justify-between text-[13px]">
+                  {/* <div className="flex justify-between text-[13px]">
                     <span className="text-on-surface-variant">
                       {field.attribute}
                     </span>
                     <span className="font-semibold text-emerald-600">
                       {field.attributeValue}
                     </span>
-                  </div>
+                  </div> */}
                 </div>
               </div>
               <button className="w-full py-3 bg-primary text-white rounded-lg font-label-md flex items-center justify-center gap-2 hover:bg-primary-container transition-colors mt-auto">
@@ -252,102 +317,50 @@ export default function MyFields() {
             </button>
           </div>
         </div>
-       
       </main>
 
-       {isOpen && (
+      {isOpen && (
         <>
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-md">
             <div className="relative bg-white w-full max-w-lg rounded-2xl custom-shadow-lvl2 overflow-hidden flex flex-col">
-              <div className="px-8 py-6 border-b border-zinc-100 flex items-center justify-between bg-emerald-50/10">
-                <div>
-                  <h3 className="text-2xl font-bold text-primary">
-                    Add New Field
-                  </h3>
-                  <p className="text-sm text-zinc-500">
-                    Enter plot details for new cultivation
-                  </p>
-                </div>
-                <button className="text-zinc-400 hover:text-zinc-600 cursor-pointer">
-                  <X className="material-symbols-outlined" data-icon="close">
-                    close
-                  </X>
-                </button>
-              </div>
-              <div className="p-8 space-y-6">
-                <div className="space-y-2">
-                  <label className="font-semibold text-neutral">
-                    Field Name
-                  </label>
-                  <input
-                    className="w-full bg-[#F1F3F5] border-zinc-200 rounded-lg px-4 py-2.5 focus:ring-primary/10 focus:border-primary focus:bg-white transition-all outline-none"
-                    placeholder="e.g. West Coast Hill Plot 3"
-                    type="text"
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="font-semibold text-neutral">
-                      Crop Type
-                    </label>
-                    <select className="w-full bg-[#F1F3F5] border-zinc-200 rounded-lg px-4 py-2.5 focus:ring-primary/10 focus:border-primary focus:bg-white transition-all outline-none appearance-none">
-                      <option>Wheat</option>
-                      <option>Corn</option>
-                      <option>Soybeans</option>
-                      <option>Rice</option>
-                    </select>
-                  </div>
-                  <div className="space-y-2">
-                    <label className="font-semibold text-neutral">
-                      Planting Date
-                    </label>
-                    <input
-                      className="w-full bg-[#F1F3F5] border-zinc-200 rounded-lg px-4 py-2.5 focus:ring-primary/10 focus:border-primary focus:bg-white transition-all outline-none"
-                      type="date"
-                    />
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="font-semibold text-neutral">
-                      Current Stage
-                    </label>
-                    <select className="w-full bg-[#F1F3F5] border-zinc-200 rounded-lg px-4 py-2.5 focus:ring-primary/10 focus:border-primary focus:bg-white transition-all outline-none appearance-none">
-                      <option>Planted</option>
-                      <option>Growing</option>
-                      <option>Ready</option>
-                      <option>Harvested</option>
-                    </select>
-                  </div>
-                  <div className="space-y-2">
-                    <label className="font-semibold text-neutral">
-                      Assign Agent
-                    </label>
-                    <select className="w-full bg-[#F1F3F5] border-zinc-200 rounded-lg px-4 py-2.5 focus:ring-primary/10 focus:border-primary focus:bg-white transition-all outline-none appearance-none">
-                      <option>Marcus Chen</option>
-                      <option>Sarah Jenkins</option>
-                      <option>David Miller</option>
-                      <option>Unassigned</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-              <div className="px-8 py-6 bg-zinc-50 border-t border-zinc-100 flex justify-end gap-3">
-                <button
-                  onClick={openModel}
-                  className="px-6 py-2.5 text-zinc-600 font-label-md hover:bg-zinc-200 rounded-lg transition-colors"
+              <form onSubmit={handleUpdateField}>
+                <select
+                  value={selectedFieldId}
+                  onChange={(e) => setSelectedFieldId(e.target.value)}
                 >
-                  Cancel
+                  <option value="">Select field</option>
+                  {fields.map((field) => (
+                    <option key={field.id} value={field.id}>
+                      {field.name}
+                    </option>
+                  ))}
+                </select>
+
+                <select
+                  value={newStage}
+                  onChange={(e) => setNewStage(e.target.value)}
+                >
+                  <option value="">Select stage</option>
+                  <option value="planted">Planted</option>
+                  <option value="growing">Growing</option>
+                  <option value="ready">Ready</option>
+                  <option value="harvested">Harvested</option>
+                </select>
+
+                <textarea
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                  placeholder="Enter notes"
+                />
+
+                <button type="submit">
+                  {submitting ? "Saving..." : "Submit Update"}
                 </button>
-                <button className="bg-primary hover:bg-emerald-900 text-white px-8 py-2.5 rounded-lg font-label-md transition-colors custom-shadow-lvl1">
-                  Save Field
-                </button>
-              </div>
+              </form>
             </div>
           </div>
         </>
       )}
-      
     </RoleDashboardLayout>
   );
 }

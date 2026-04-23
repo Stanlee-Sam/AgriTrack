@@ -7,11 +7,31 @@ import {
 } from "lucide-react";
 import RoleDashboardLayout from "../../components/layout/RoleDashboardLayout";
 import { navigationByRole } from "../../components/layout/navigation";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 export default function DashboardAgent() {
+  const [data, setData] = useState(null);
+  const agentId = localStorage.getItem("userId");
+
   const handleLogout = () => {
     window.alert("Logout action goes here.");
   };
+
+  useEffect(() => {
+    const fetchDashboard = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:5000/dashboard/agent/${agentId}`,
+        );
+        setData(response.data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchDashboard();
+  }, [agentId]);
 
   return (
     <RoleDashboardLayout
@@ -27,7 +47,7 @@ export default function DashboardAgent() {
               <h1 className="font-bold text-3xl text-on-surface">
                 Your Assigned Fields
               </h1>
-            <p className="font-body-md text-body-md text-on-surface-variant">
+              <p className="font-body-md text-body-md text-on-surface-variant">
                 Welcome back, Agent Smith. Here is your current operational
                 overview.
               </p>
@@ -56,8 +76,7 @@ export default function DashboardAgent() {
                 </span>
               </div>
               <div>
-                <p className="text-3xl font-bold text-on-surface">
-                  12</p>
+                <p className="text-3xl font-bold text-on-surface">{data?.assignedFields}</p>
                 <p className="font-semibold text-on-surface-variant">
                   Assigned Fields
                 </p>
@@ -76,7 +95,7 @@ export default function DashboardAgent() {
                 </span>
               </div>
               <div>
-                <p className="text-3xl font-bold text-on-surface">2</p>
+                <p className="text-3xl font-bold text-on-surface">{data.atRiskFields}</p>
                 <p className="font-semibold text-on-surface-variant">
                   Fields At Risk
                 </p>
@@ -95,7 +114,7 @@ export default function DashboardAgent() {
                 </span>
               </div>
               <div>
-                <p className="text-3xl font-bold text-on-surface">4</p>
+                <p className="text-3xl font-bold text-on-surface">{data.completedFields}</p>
                 <p className="font-semibold text-on-surface-variant">
                   Fields Ready for Harvest
                 </p>
@@ -174,7 +193,6 @@ export default function DashboardAgent() {
                   <tr className="hover:bg-primary/5 transition-colors border-b border-outline-variant bg-surface-container-low">
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-sm">
-                       
                         <span className="font-semibold">East Vineyard</span>
                       </div>
                     </td>
@@ -196,7 +214,6 @@ export default function DashboardAgent() {
                   <tr className="hover:bg-primary/5 transition-colors border-b border-outline-variant">
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-sm">
-                        
                         <span className="font-semibold">West Wheat Patch</span>
                       </div>
                     </td>
@@ -218,7 +235,6 @@ export default function DashboardAgent() {
                   <tr className="hover:bg-primary/5 transition-colors">
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-sm">
-                        
                         <span className="font-semibold">South Soy Sector</span>
                       </div>
                     </td>

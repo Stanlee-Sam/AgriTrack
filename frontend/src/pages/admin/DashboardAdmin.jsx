@@ -1,12 +1,49 @@
 import RoleDashboardLayout from "../../components/layout/RoleDashboardLayout";
 import { navigationByRole } from "../../components/layout/navigation";
-import { CircleCheck, ClipboardCheck, Leaf, Map, TriangleAlert } from "lucide-react";
+import {
+  CircleCheck,
+  ClipboardCheck,
+  Leaf,
+  Map,
+  TriangleAlert,
+} from "lucide-react";
 import DoughnutChart from "../../components/charts/AdminDashboardChart";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 export default function DashboardAdmin() {
+  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState({});
+  const [fieldsPercentage, setFieldsPercentage] = useState(0);
   const handleLogout = () => {
     window.alert("Logout action goes here.");
   };
+
+  useEffect(() => {
+    const fetchAdminDashboard = async () => {
+      setLoading(true);
+      try {
+        const response = await axios.get(
+          "http://localhost:5000/dashboard/admin",
+        );
+        setData(response.data);
+        console.log(response.data);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAdminDashboard();
+  }, []);
+
+  useEffect(() => {
+    if (!data.totalFields || !data.completedFields) return;
+
+    const percentage = (data.completedFields / data.totalFields) * 100;
+    setFieldsPercentage(percentage);
+  }, [data]);
 
   return (
     <RoleDashboardLayout
@@ -29,7 +66,9 @@ export default function DashboardAdmin() {
             <p className="text-zinc-500 text-label-md font-medium">
               Total Fields
             </p>
-            <h3 className="text-h3 font-h3 text-on-surface mt-1">128</h3>
+            <h3 className="text-h3 font-h3 text-on-surface mt-1">
+              {data.totalFields}
+            </h3>
           </div>
           <div className="bg-white p-6 rounded-xl border border-zinc-100 shadow-[0_12px_24px_-10px_rgba(45,106,79,0.08)]">
             <div className="flex justify-between items-start mb-4">
@@ -43,7 +82,9 @@ export default function DashboardAdmin() {
             <p className="text-zinc-500 text-label-md font-medium">
               Active Fields
             </p>
-            <h3 className="text-h3 font-h3 text-on-surface mt-1">84</h3>
+            <h3 className="text-h3 font-h3 text-on-surface mt-1">
+              {data.activeFields}
+            </h3>
           </div>
           <div className="bg-white p-6 rounded-xl border border-zinc-100 shadow-[0_12px_24px_-10px_rgba(45,106,79,0.08)]">
             <div className="flex justify-between items-start mb-4">
@@ -57,7 +98,9 @@ export default function DashboardAdmin() {
             <p className="text-zinc-500 text-label-md font-medium">
               At Risk Fields
             </p>
-            <h3 className="text-h3 font-h3 text-on-surface mt-1">12</h3>
+            <h3 className="text-h3 font-h3 text-on-surface mt-1">
+              {data.atRiskFields}
+            </h3>
           </div>
           <div className="bg-white p-6 rounded-xl border border-zinc-100 shadow-[0_12px_24px_-10px_rgba(45,106,79,0.08)]">
             <div className="flex justify-between items-start mb-4">
@@ -71,7 +114,9 @@ export default function DashboardAdmin() {
             <p className="text-zinc-500 text-label-md font-medium">
               Completed Fields
             </p>
-            <h3 className="text-h3 font-h3 text-on-surface mt-1">32</h3>
+            <h3 className="text-h3 font-h3 text-on-surface mt-1">
+              {data.completedFields}
+            </h3>
           </div>
         </section>
         <section className="grid grid-cols-1 lg:grid-cols-12 gap-5">
@@ -83,7 +128,7 @@ export default function DashboardAdmin() {
               <div className="relative w-48 h-48 flex items-center justify-center">
                 <DoughnutChart />
                 <div className="absolute flex flex-col items-center">
-                  <span className="text-h3 font-h3">65%</span>
+                  <span className="text-h3 font-h3">{fieldsPercentage}%</span>
                   <span className="text-caption text-zinc-500">Active</span>
                 </div>
               </div>
@@ -93,21 +138,21 @@ export default function DashboardAdmin() {
                     <div className="w-3 h-3 rounded-full bg-emerald-600"></div>
                     <span className="">Active</span>
                   </div>
-                  <span className="font-bold">84</span>
+                  <span className="font-bold">{data.activeFields}</span>
                 </div>
                 <div className="flex items-center justify-between text-label-md">
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full bg-red-500"></div>
                     <span className="">At Risk</span>
                   </div>
-                  <span className="font-bold">12</span>
+                  <span className="font-bold">{data.atRiskFields}</span>
                 </div>
                 <div className="flex items-center justify-between text-label-md">
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full bg-secondary"></div>
                     <span className="">Completed</span>
                   </div>
-                  <span className="font-bold">32</span>
+                  <span className="font-bold">{data.completedFields}</span>
                 </div>
               </div>
             </div>
@@ -297,7 +342,7 @@ export default function DashboardAdmin() {
           </div>
           <div className="bg-primary-container p-8 rounded-xl flex flex-col justify-center text-white">
             <div className="w-12 h-12 bg-on-primary-container/20 rounded-lg flex items-center justify-center mb-6">
-              <Leaf className="material-symbols-outlined text-white"/>
+              <Leaf className="material-symbols-outlined text-white" />
             </div>
             <h5 className="text-2xl font-h3 mb-2">
               Sustainable Yield Projections

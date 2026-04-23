@@ -79,7 +79,13 @@ export const createFieldUpdate = async (req, res) => {
 
 export const getAllFieldUpdates = async (req, res) => {
   try {
-    const fieldUpdates = await prisma.fieldUpdate.findMany();
+    const fieldUpdates = await prisma.fieldUpdate.findMany({
+      orderBy: { createdAt: "desc" },
+      include: {
+        field: true,
+        agent: true,
+      },
+    });
 
     res.status(200).json(fieldUpdates);
   } catch (error) {
@@ -87,3 +93,4 @@ export const getAllFieldUpdates = async (req, res) => {
     res.status(500).json({ message: "Failed to get field updates" });
   }
 };
+

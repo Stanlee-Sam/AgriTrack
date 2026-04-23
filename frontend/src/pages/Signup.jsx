@@ -1,6 +1,7 @@
 import axios from "axios";
 import { Eye, Lock, Mail, Tractor, User } from "lucide-react";
 import { useState } from "react";
+import { ClipLoader } from "react-spinners";
 import { toast } from "sonner";
 
 const Signup = () => {
@@ -168,7 +169,7 @@ const Signup = () => {
               className="w-full rounded-xl bg-primary px-4 py-3 text-sm font-semibold leading-[1.2] tracking-[0.02em] text-on-primary shadow-md transition hover:bg-tertiary active:scale-[0.98]"
               type="submit"
             >
-              Sign UP
+              {loading ? <ClipLoader /> : "Sign Up"}
             </button>
           </form>
 

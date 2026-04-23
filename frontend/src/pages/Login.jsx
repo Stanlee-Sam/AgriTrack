@@ -1,13 +1,15 @@
 import { Eye, Lock, Mail, Tractor } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import axios from 'axios';
+import axios from "axios";
 import { ClipLoader } from "react-spinners";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
@@ -33,6 +35,16 @@ const Login = () => {
       });
       localStorage.setItem("token", respone.data.accessToken);
       toast.success("Login successful");
+
+      const payload = JSON.parse(atob(response.data.accessToken.split(".")[1]));
+      localStorage.setItem("userRole", payload.role);
+      localStorage.setItem("userId", payload.userId);
+
+      if (payload.role === "admin") {
+        navigate("dashboard-admin");
+      } else {
+        navigate("dashboard-agent");
+      }
     } catch (error) {
       toast.error(error);
     } finally {
@@ -144,7 +156,7 @@ const Login = () => {
               className="w-full rounded-xl bg-primary px-4 py-3 text-sm font-semibold leading-[1.2] tracking-[0.02em] text-on-primary shadow-md transition hover:bg-tertiary active:scale-[0.98]"
               type="submit"
             >
-              {loading ? (<ClipLoader />) : 'Login'}
+              {loading ? <ClipLoader /> : "Login"}
             </button>
           </form>
 

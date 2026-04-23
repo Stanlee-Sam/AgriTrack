@@ -11,16 +11,92 @@ import {
 import RoleDashboardLayout from "../../components/layout/RoleDashboardLayout";
 import { navigationByRole } from "../../components/layout/navigation";
 import { CircleCheck, TriangleAlert } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function Fields() {
   const [isOpen, setIsOpen] = useState(false);
+  const [fields, setFields] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    cropType: "",
+    plantingDate: "",
+    currentStage: "planted",
+  });
+  const [agents, setAgents] = useState([]);
+
   const handleLogout = () => {
     window.alert("Logout action goes here.");
   };
 
   const modalOpen = () => {
     setIsOpen(!isOpen);
+  };
+
+  useEffect(() => {
+    const fetchFields = async () => {
+      setLoading(true);
+      try {
+        const response = await axios.get("http://localhost:5000/fields");
+        setFields(response.data);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFields();
+  }, []);
+
+  const handleCreateField = async (e) => {
+    e.preventDefault();
+
+    try {
+      await axios.post("http://localhost:5000/fields/create", formData);
+      alert("Field created");
+
+      const response = await axios.get("http://localhost:5000/fields");
+      setFields(response.data);
+
+      setFormData({
+        name: "",
+        cropType: "",
+        plantingDate: "",
+        currentStage: "planted",
+      });
+      setIsOpen(false);
+    } catch (error) {
+      console.error(error);
+      alert("Failed to create field");
+    }
+  };
+
+  useEffect(() => {
+    const fetchAgents = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/fields/agents");
+        setAgents(response.data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchAgents();
+  }, []);
+
+  const handleAssignAgent = async (fieldId, assignedAgentId) => {
+    try {
+      await axios.put(`http://localhost:5000/fields/${fieldId}/assign`, {
+        assignedAgentId,
+      });
+
+      const response = await axios.get("http://localhost:5000/fields");
+      setFields(response.data);
+    } catch (error) {
+      console.error(error);
+      alert("Failed to assign field");
+    }
   };
 
   return (
@@ -147,6 +223,56 @@ export default function Fields() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-outline-variant">
+                {fields.map((field) => (
+                  <tr className="table-row-hover transition-colors">
+                    <td className="px-4 py-4">
+                      <div className="flex items-center gap-3">
+                        <div>
+                          <div className="font-label-md text-on-surface">
+                            {field.name}
+                          </div>
+                          <div className="text-caption text-outline">
+                            120 Acres • Soil Type: Loamy
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-gutter py-4 text-body-md text-on-surface-variant">
+                      {field.cropType}
+                    </td>
+                    <td className="px-gutter py-4 text-body-md text-on-surface-variant">
+                      {new Date(field.plantingDate).toDateString()}
+                    </td>
+                    <td className="px-gutter py-4">
+                      <div className="w-full bg-zinc-100 rounded-full h-2 mb-1 max-w-[120px]">
+                        <div className="bg-primary h-2 rounded-full w-3/4"></div>
+                      </div>
+                      <span className="text-caption text-primary font-semibold">
+                        {field.currentStage}
+                      </span>
+                    </td>
+                    <td className="px-gutter py-4">
+                      <span className="text-body-md">
+                        {field.assignedAgent}
+                      </span>
+                    </td>
+                    <td className="px-gutter py-4">
+                      <span className="px-3 py-1 bg-secondary-fixed text-on-secondary-fixed-variant rounded-full text-caption font-bold">
+                        Optimal
+                      </span>
+                    </td>
+                    <td className="px-4 py-4 text-right">
+                      <button className="p-2 hover:bg-zinc-200 rounded-lg transition-colors text-outline">
+                        <Edit
+                          className="material-symbols-outlined"
+                          data-icon="edit"
+                        >
+                          edit
+                        </Edit>
+                      </button>
+                    </td>
+                  </tr>
+                ))}
                 <tr className="table-row-hover transition-colors">
                   <td className="px-4 py-4">
                     <div className="flex items-center gap-3">
@@ -429,7 +555,7 @@ export default function Fields() {
       {isOpen && (
         <>
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-md">
-            <div className="relative bg-white w-full max-w-lg rounded-2xl custom-shadow-lvl2 overflow-hidden flex flex-col">
+            <form className="relative bg-white w-full max-w-lg rounded-2xl custom-shadow-lvl2 overflow-hidden flex flex-col">
               <div className="px-8 py-6 border-b border-zinc-100 flex items-center justify-between bg-emerald-50/10">
                 <div>
                   <h3 className="text-2xl font-bold text-primary">
@@ -451,6 +577,10 @@ export default function Fields() {
                     Field Name
                   </label>
                   <input
+                    value={formData.name}
+                    onChange={(e) =>
+                      setFormData({ ...formData, name: e.target.value })
+                    }
                     className="w-full bg-[#F1F3F5] border-zinc-200 rounded-lg px-4 py-2.5 focus:ring-primary/10 focus:border-primary focus:bg-white transition-all outline-none"
                     placeholder="e.g. West Coast Hill Plot 3"
                     type="text"
@@ -461,12 +591,15 @@ export default function Fields() {
                     <label className="font-semibold text-neutral">
                       Crop Type
                     </label>
-                    <select className="w-full bg-[#F1F3F5] border-zinc-200 rounded-lg px-4 py-2.5 focus:ring-primary/10 focus:border-primary focus:bg-white transition-all outline-none appearance-none">
-                      <option>Wheat</option>
-                      <option>Corn</option>
-                      <option>Soybeans</option>
-                      <option>Rice</option>
-                    </select>
+                    <input
+                      type="text"
+                      placeholder="Crop type"
+                      value={formData.cropType}
+                      onChange={(e) =>
+                        setFormData({ ...formData, cropType: e.target.value })
+                      }
+                      className="w-full bg-[#F1F3F5] border-zinc-200 rounded-lg px-4 py-2.5 focus:ring-primary/10 focus:border-primary focus:bg-white transition-all outline-none"
+                    />
                   </div>
                   <div className="space-y-2">
                     <label className="font-semibold text-neutral">
@@ -475,6 +608,13 @@ export default function Fields() {
                     <input
                       className="w-full bg-[#F1F3F5] border-zinc-200 rounded-lg px-4 py-2.5 focus:ring-primary/10 focus:border-primary focus:bg-white transition-all outline-none"
                       type="date"
+                      value={formData.plantingDate}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          plantingDate: e.target.value,
+                        })
+                      }
                     />
                   </div>
                 </div>
@@ -483,22 +623,39 @@ export default function Fields() {
                     <label className="font-semibold text-neutral">
                       Current Stage
                     </label>
-                    <select className="w-full bg-[#F1F3F5] border-zinc-200 rounded-lg px-4 py-2.5 focus:ring-primary/10 focus:border-primary focus:bg-white transition-all outline-none appearance-none">
-                      <option>Planted</option>
-                      <option>Growing</option>
-                      <option>Ready</option>
-                      <option>Harvested</option>
+                    <select
+                      value={formData.currentStage}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          currentStage: e.target.value,
+                        })
+                      }
+                      className="w-full bg-[#F1F3F5] border-zinc-200 rounded-lg px-4 py-2.5 focus:ring-primary/10 focus:border-primary focus:bg-white transition-all outline-none appearance-none"
+                    >
+                      <option value="planted">Planted</option>
+                      <option value="growing">Growing</option>
+                      <option value="ready">Ready</option>
+                      <option value="harvested">Harvested</option>
                     </select>
                   </div>
                   <div className="space-y-2">
                     <label className="font-semibold text-neutral">
                       Assign Agent
                     </label>
-                    <select className="w-full bg-[#F1F3F5] border-zinc-200 rounded-lg px-4 py-2.5 focus:ring-primary/10 focus:border-primary focus:bg-white transition-all outline-none appearance-none">
-                      <option>Marcus Chen</option>
-                      <option>Sarah Jenkins</option>
-                      <option>David Miller</option>
-                      <option>Unassigned</option>
+                    <select
+                      onChange={(e) =>
+                        handleAssignAgent(field.id, e.target.value)
+                      }
+                      defaultValue=""
+                      className="w-full bg-[#F1F3F5] border-zinc-200 rounded-lg px-4 py-2.5 focus:ring-primary/10 focus:border-primary focus:bg-white transition-all outline-none appearance-none"
+                    >
+                      <option value="">Assign agent</option>
+                      {agents.map((agent) => (
+                        <option key={agent.id} value={agent.id}>
+                          {agent.name}
+                        </option>
+                      ))}
                     </select>
                   </div>
                 </div>
@@ -514,7 +671,7 @@ export default function Fields() {
                   Save Field
                 </button>
               </div>
-            </div>
+            </form>
           </div>
         </>
       )}
