@@ -4,9 +4,12 @@ import {
   getAgentDashboardData,
 } from "../Controllers/dashboardController.js";
 
+import isAdmin from "../middleware/roleMiddleware.js";
+import authenticateToken from "../middleware/authMiddleware.js";
+
 const router = express.Router();
 
-router.get("/admin", getAdminDashboardData);
-router.get("/agent/:id", getAgentDashboardData);
+router.get("/admin", authenticateToken, isAdmin, getAdminDashboardData);
+router.get("/agent/:id", authenticateToken, getAgentDashboardData);
 
 export default router;

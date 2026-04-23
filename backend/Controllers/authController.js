@@ -12,7 +12,7 @@ const generateAccessToken = (user) => {
   return jwt.sign(
     { userId: user.id, role: user.role || "agent" },
     process.env.ACCESS_TOKEN_SECRET,
-    { expiresIn: "1d" },
+    { expiresIn: "7d" },
   );
 };
 

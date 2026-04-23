@@ -9,10 +9,15 @@ const STAGES = ["planted", "growing", "ready", "harvested"];
 
 export const createFieldUpdate = async (req, res) => {
   try {
-    const { newStage, note, fieldId, agentId } = req.body;
+    const { newStage, note, fieldId } = req.body;
+    const agentId = req.user.userId
 
-    if (!newStage || !note || !fieldId || !agentId) {
+    if (!newStage || !note || !fieldId) {
       return res.status(400).json({ message: "All fields are required" });
+    }
+
+    if(req.user.role !== 'agent'){
+        return res.status(400).json({ message : 'Agents only'})
     }
 
     if (!STAGES.includes(newStage)) {
@@ -37,10 +42,6 @@ export const createFieldUpdate = async (req, res) => {
 
     if(!agent) {
         return res.status(404).json({ message : 'Agent does not exist'})
-    }
-
-    if(agent.role !== 'agent'){
-        return res.status(400).json({ message : 'User must have agent role'})
     }
 
     if(existingField.assignedAgentId !== agentId) {

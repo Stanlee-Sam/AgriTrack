@@ -6,13 +6,15 @@ import {
   getAllFields,
   getAssignedFields,
 } from "../Controllers/fieldController.js";
+import isAdmin from "../middleware/roleMiddleware.js";
+import authenticateToken from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-router.post("/create", createField);
-router.put("/:id/assign", assignFieldToAgent);
-router.put("/update/:id", updateField);
-router.get("/", getAllFields);
-router.get("/assigned-fields/:id", getAssignedFields);
+router.post("/create", authenticateToken, isAdmin, createField);
+router.put("/:id/assign", authenticateToken, isAdmin, assignFieldToAgent);
+router.put("/update/:id", authenticateToken, isAdmin, updateField);
+router.get("/", authenticateToken, isAdmin, getAllFields);
+router.get("/assigned-fields/:id", authenticateToken, getAssignedFields);
 
 export default router;

@@ -51,7 +51,7 @@ export const getAdminDashboardData = async (req, res) => {
 };
 export const getAgentDashboardData = async (req, res) => {
   try {
-    const agentId = req.user.id;
+    const agentId = req.user.userId;
 
     const fields = await prisma.field.findMany({
       where: {
