@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import axios from "axios";
 import { ClipLoader } from "react-spinners";
 import { useNavigate } from "react-router-dom";
+import api from "../lib/api";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -29,21 +30,22 @@ const Login = () => {
 
     setLoading(true);
     try {
-      const respone = await axios.post("http://localhost:5000/auth/login", {
+      const response = await api.post("/auth/login", {
         email: email,
         password: password,
       });
-      localStorage.setItem("token", respone.data.accessToken);
+      localStorage.setItem("token", response.data.accessToken);
       toast.success("Login successful");
 
       const payload = JSON.parse(atob(response.data.accessToken.split(".")[1]));
       localStorage.setItem("userRole", payload.role);
       localStorage.setItem("userId", payload.userId);
+      console.log("TOKEN PAYLOAD:", payload);
 
       if (payload.role === "admin") {
-        navigate("dashboard-admin");
+        navigate("/dashboard-admin");
       } else {
-        navigate("dashboard-agent");
+        navigate("/dashboard-agent");
       }
     } catch (error) {
       toast.error(error);

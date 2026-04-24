@@ -14,14 +14,11 @@ const parsePlantingDate = (value) => {
 
 export const createField = async (req, res) => {
   try {
-    const { name, cropType, plantingDate, currentStage } = req.body;
+    const { name, cropType, plantingDate, currentStage, assignedAgentId } =
+      req.body;
+    let agent = null;
 
-    if (
-      !name ||
-      !cropType ||
-      !plantingDate ||
-      !currentStage
-    ) {
+    if (!name || !cropType || !plantingDate || !currentStage) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
@@ -34,18 +31,39 @@ export const createField = async (req, res) => {
       return res.status(400).json({ message: "Invalid planting date" });
     }
 
+    if (assignedAgentId) {
+      agent = await prisma.user.findUnique({
+        where: { id: assignedAgentId },
+      });
+
+      if (!agent) {
+        return res.status(404).json({ message: "Agent does not exist" });
+      }
+
+      if (agent.role !== "agent") {
+        return res.status(400).json({ message: "User is not an agent" });
+      }
+    }
+
     const newField = await prisma.field.create({
       data: {
         name,
         cropType,
         plantingDate: parsedPlantingDate,
         currentStage,
+        assignedAgentId: assignedAgentId || null,
+      },
+      include: {
+        agent: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
       },
     });
 
-    res.status(201).json({
-      newField,
-    });
+    return res.status(201).json(newField);
   } catch (error) {
     console.error("Error creating field:", error);
     if (error?.code === "P2002") {
@@ -57,7 +75,17 @@ export const createField = async (req, res) => {
 
 export const getAllFields = async (req, res) => {
   try {
-    const fields = await prisma.field.findMany();
+    const fields = await prisma.field.findMany({
+      include: {
+        agent: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
+    });
 
     res.status(200).json(fields);
   } catch (error) {
@@ -68,7 +96,7 @@ export const getAllFields = async (req, res) => {
 
 export const getAssignedFields = async (req, res) => {
   try {
-    const assignedAgentId = req.params.id;
+    const assignedAgentId = req.user.userId;
 
     const existingAgent = await prisma.user.findUnique({
       where: {
@@ -81,8 +109,15 @@ export const getAssignedFields = async (req, res) => {
     }
 
     const assignedFields = await prisma.field.findMany({
-      where: {
-        assignedAgentId,
+      where: { assignedAgentId },
+      include: {
+        agent: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
       },
     });
 
@@ -95,11 +130,27 @@ export const getAssignedFields = async (req, res) => {
 
 export const updateField = async (req, res) => {
   try {
-    const { name, cropType, plantingDate, currentStage } = req.body;
+    const { name, cropType, plantingDate, currentStage, assignedAgentId } =
+      req.body;
     const fieldId = req.params.id;
+    let agent = null;
 
     if (!name || !cropType || !plantingDate || !currentStage) {
       return res.status(400).json({ message: "All fields are required" });
+    }
+
+    if (assignedAgentId) {
+      agent = await prisma.user.findUnique({
+        where: { id: assignedAgentId },
+      });
+
+      if (!agent) {
+        return res.status(404).json({ message: "Agent does not exist" });
+      }
+
+      if (agent.role !== "agent") {
+        return res.status(400).json({ message: "User is not an agent" });
+      }
     }
 
     if (!STAGES.includes(currentStage)) {
@@ -128,12 +179,19 @@ export const updateField = async (req, res) => {
         cropType,
         plantingDate: parsedPlantingDate,
         currentStage,
+        assignedAgentId: assignedAgentId || null,
+      },
+      include: {
+        agent: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
       },
     });
 
-    res.status(200).json({
-      updatedField,
-    });
+    return res.status(200).json(updatedField);
   } catch (error) {
     console.error("Error updating field:", error);
     res.status(500).json({ message: "Failed to update field" });
@@ -178,18 +236,42 @@ export const assignFieldToAgent = async (req, res) => {
 
     const assignedField = await prisma.field.update({
       where: { id: fieldId },
-      data: {
-        assignedAgentId,
+      data: { assignedAgentId },
+      include: {
+        agent: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
       },
     });
 
-    res.status(200).json({
-      message: "Field assigned successfully",
-      assignedField,
-    });
+    return res.status(200).json(assignedField);
   } catch (error) {
     console.error("Error assigning field to agent:", error);
     res.status(500).json({ message: "Failed to assign field to agent" });
+  }
+};
+
+export const getAgents = async (_req, res) => {
+  try {
+    const agents = await prisma.user.findMany({
+      where: { role: "agent" },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+      },
+      orderBy: {
+        name: "asc",
+      },
+    });
+
+    res.status(200).json(agents);
+  } catch (error) {
+    console.error("Error fetching agents:", error);
+    res.status(500).json({ message: "Failed to fetch agents" });
   }
 };
 

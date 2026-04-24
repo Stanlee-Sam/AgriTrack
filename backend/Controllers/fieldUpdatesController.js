@@ -9,15 +9,16 @@ const STAGES = ["planted", "growing", "ready", "harvested"];
 
 export const createFieldUpdate = async (req, res) => {
   try {
-    const { newStage, note, fieldId } = req.body;
-    const agentId = req.user.userId
+    const { newStage, note } = req.body;
+    const fieldId = req.params.id;
+    const agentId = req.user?.userId;
 
-    if (!newStage || !note || !fieldId) {
-      return res.status(400).json({ message: "All fields are required" });
+    if (!req.user || !agentId) {
+      return res.status(401).json({ message: "Unauthorized" });
     }
-
-    if(req.user.role !== 'agent'){
-        return res.status(400).json({ message : 'Agents only'})
+    
+    if (!newStage || !note || !fieldId || !agentId) {
+      return res.status(400).json({ message: "All fields are required" });
     }
 
     if (!STAGES.includes(newStage)) {
@@ -25,54 +26,60 @@ export const createFieldUpdate = async (req, res) => {
     }
 
     const existingField = await prisma.field.findUnique({
-        where : {
-            id : fieldId
-        }
-    })
+      where: {
+        id: fieldId,
+      },
+    });
 
-    if(!existingField) {
-        return res.status(404).json({ message : 'Field does not exist'})
+    if (!existingField) {
+      return res.status(404).json({ message: "Field does not exist" });
     }
 
-    const agent = await prisma.user.findUnique({
-        where : {
-            id : agentId
-        }
-    })
-
-    if(!agent) {
-        return res.status(404).json({ message : 'Agent does not exist'})
-    }
-
-    if(existingField.assignedAgentId !== agentId) {
-        return res.status(403).json({ message : 'Agent is not assigned to this field'})
+    if (
+      !existingField.assignedAgentId ||
+      existingField.assignedAgentId !== agentId
+    ) {
+      return res
+        .status(403)
+        .json({ message: "Agent is not assigned to this field" });
     }
 
     const result = await prisma.$transaction(async (tx) => {
-        const fieldUpdate = await tx.fieldUpdate.create({
-          data: {
-            fieldId,
-            agentId,
-            newStage,
-            note,
-          },
-        });
-      
-        await tx.field.update({
-          where: { id: fieldId },
-          data: { currentStage: newStage },
-        });
-      
-        return fieldUpdate;
-      });
-      
-      return res.status(201).json({
-        message: "Field update created",
-        fieldUpdate: result,
+      const fieldUpdate = await tx.fieldUpdate.create({
+        data: {
+          fieldId,
+          agentId,
+          newStage,
+          note,
+        },
       });
 
+      await tx.field.update({
+        where: { id: fieldId },
+        data: { currentStage: newStage },
+      });
+
+      return tx.fieldUpdate.findUnique({
+        where: { id: fieldUpdate.id },
+        include: {
+          field: true,
+          agent: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+        },
+      });
+    });
+
+    return res.status(201).json({
+      message: "Field update created",
+      fieldUpdate: result,
+    });
   } catch (error) {
-    console.error("Error creating field update:" , error);
+    console.error("Error creating field update:", error);
     res.status(500).json({ message: "Failed to create field update" });
   }
 };
@@ -83,7 +90,13 @@ export const getAllFieldUpdates = async (req, res) => {
       orderBy: { createdAt: "desc" },
       include: {
         field: true,
-        agent: true,
+        agent: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
       },
     });
 
@@ -93,4 +106,3 @@ export const getAllFieldUpdates = async (req, res) => {
     res.status(500).json({ message: "Failed to get field updates" });
   }
 };
-

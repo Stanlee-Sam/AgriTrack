@@ -18,90 +18,66 @@ import RoleDashboardLayout from "../../components/layout/RoleDashboardLayout";
 import { navigationByRole } from "../../components/layout/navigation";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import api from "../../lib/api";
+import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 export default function MyFields() {
   const [isOpen, setIsOpen] = useState(false);
   const [fields, setFields] = useState([]);
   const [loading, setLoading] = useState(false);
-  const agentId = localStorage.getItem("userId");
   const [selectedFieldId, setSelectedFieldId] = useState("");
   const [newStage, setNewStage] = useState("");
   const [note, setNote] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  // const fields = [
-  //   {
-  //     id: 1,
-  //     name: "North Cornfield",
-  //     crop: "Corn",
-  //     cropType: "Hybrid Z-42",
-  //     icon: <Sprout />,
-  //     status: "growing",
-  //     attribute: "Moisture",
-  //     attributeValue: "68% Optimal",
-  //     datePlanted: "March 15, 2023",
-  //   },
-  //   {
-  //     id: 2,
-  //     name: "East Vineyard",
-  //     crop: "Grapes",
-  //     cropType: "Cabernet Sauvignon",
-  //     icon: <Flower />,
-  //     status: "Ready for harvest",
-  //     attribute: "Sugar Level",
-  //     attributeValue: "24.5 Brix",
-  //     datePlanted: "March 15, 2023",
-  //   },
-  //   {
-  //     id: 3,
-  //     name: "South Wheatfield",
-  //     crop: "Wheat",
-  //     cropType: "Winter Gold",
-  //     icon: <Sprout />,
-  //     status: "growing",
-  //     attribute: "Nitrogen Level",
-  //     attributeValue: "Stable",
-  //   },
-  //   {
-  //     id: 4,
-  //     name: "West Applefield",
-  //     crop: "Apples",
-  //     cropType: "Golden Delicious",
-  //     icon: <Droplet />,
-  //     status: "Irrigating",
-  //     attribute: "Water flow",
-  //     attributeValue: "Active",
-  //     datePlanted: "March 15, 2023",
-  //   },
-  // ];
+  const navigate = useNavigate();
 
   const statusStyles = {
-    growing: "bg-secondary text-primary",
-    Irrigating: "bg-blue-100 text-blue-700",
-    "Ready for harvest": "bg-orange-100 text-orange-700",
+    active: "bg-green-100 text-green-800",
+    completed: "bg-blue-100 text-blue-700",
+    at_risk: "bg-orange-100 text-orange-700",
   };
   const handleLogout = () => {
-    window.alert("Logout action goes here.");
+    localStorage.clear();
+    navigate("/login");
+    toast.success("Logout successful");
   };
 
-  const openModel = () => {
-    setIsOpen(!isOpen);
+  const openModel = () => setIsOpen(true);
+
+  const closeModal = () => {
+    setIsOpen(false);
+    setSelectedFieldId("");
+    setNewStage("");
+    setNote("");
+  };
+
+  const openUpdateModal = (fieldId) => {
+    setSelectedFieldId(fieldId);
+    setIsOpen(true);
   };
 
   useEffect(() => {
-    const fetchAssignedFields = () => {
+    const fetchAssignedFields = async () => {
       setLoading(true);
-
       try {
-        const response = axios.get(``);
+        const response = await api.get("/fields/assigned-fields", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
         setFields(response.data);
       } catch (error) {
         console.error(error);
+        toast.error("Failed to load assigned fields");
       } finally {
         setLoading(false);
       }
     };
-  }, [agentId]);
+
+    fetchAssignedFields();
+  }, []);
 
   const handleUpdateField = async (e) => {
     e.preventDefault();
@@ -110,25 +86,34 @@ export default function MyFields() {
 
     setSubmitting(true);
     try {
-      await axios.post("http://localhost:5000/updates", {
-        fieldId: selectedFieldId,
-        newStage,
-        note,
-      });
-
-      alert("Field updated successfully");
-
-      const response = await axios.get(
-        `http://localhost:5000/fields/assigned-fields/${agentId}`,
+      await api.post(
+        `/updates/field/${selectedFieldId}`,
+        {
+          newStage,
+          note,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        },
       );
-      setFields(response.data);
 
+      toast.success("Field updated successfully");
+      setFields((prev) =>
+        prev.map((field) =>
+          field.id.toString() === selectedFieldId
+            ? { ...field, currentStage: newStage }
+            : field,
+        ),
+      );
+      setIsOpen(false);
       setSelectedFieldId("");
       setNewStage("");
       setNote("");
     } catch (error) {
       console.error(error);
-      alert("Failed to update field");
+      toast.error("Failed to update field");
     } finally {
       setSubmitting(false);
     }
@@ -171,57 +156,50 @@ export default function MyFields() {
               </ListFilter>
               Filter
             </button>
-            <button
-              onClick={openModel}
-              className="px-6 py-2 bg-primary text-[11px] md:text-[15px] text-white rounded-xl font-label-md flex items-center gap-2 shadow-sm active:scale-95 transition-all"
-            >
-              <Plus className="material-symbols-outlined " data-icon="add">
-                add
-              </Plus>
-              Register New Field
-            </button>
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-          {fields.map((field) => (
-            <div
-              key={field.id}
-              className="bg-white rounded-xl p-3 shadow-[0_12px_24px_-10px_rgba(45,106,79,0.08)] border border-zinc-100 group flex flex-col h-full"
-            >
-              <div className="flex justify-between items-start mb-4">
-                <div className="h-10 w-10 bg-emerald-50 rounded-lg flex items-center justify-center">
-                  {/* <div className="material text-primary" data-icon="grass">
-                    {field.icon}
-                  </div> */}
-                </div>
-                <div
-                  className={`px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold uppercase tracking-wider ${statusStyles[field.status]}`}
-                >
-                  {field.currentStage}
-                </div>
-              </div>
-              <div className="flex-1">
-                <h3 className="font-bold text-[18px] text-on-surface mb-1">
-                  {field.name}
-                </h3>
-                <p className="font-semibold text-caption text-primary mb-4 flex items-center gap-1">
-                  <Component
-                    className="material-symbols-outlined text-[14px]"
-                    data-icon="category"
-                  >
-                    category
-                  </Component>
-                  {/* {field.crop} • {field.cropType} */}
-                  {field.cropType}
-                </p>
-                <div className="space-y-2 mb-6">
-                  <div className="flex justify-between text-[13px]">
-                    <span className="text-on-surface-variant">Planted on</span>
-                    <span className="font-semibold text-on-surface">
-                      {new Date(field.plantingDate).toLocaleDateString()}
-                    </span>
+          {fields.map((field) => {
+            const status = getFieldStatusLabel(field);
+
+            return (
+              <div
+                key={field.id}
+                className="bg-white rounded-xl p-3 shadow-[0_12px_24px_-10px_rgba(45,106,79,0.08)] border border-zinc-100 group flex flex-col h-full"
+              >
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="font-bold text-[18px] text-on-surface mb-1">
+                      {field.name}
+                    </h3>
+                    <p className="font-semibold text-caption text-primary mb-4 flex items-center gap-1">
+                      <Component
+                        className="material-symbols-outlined text-[14px]"
+                        data-icon="category"
+                      >
+                        category
+                      </Component>
+                      {/* {field.crop} • {field.cropType} */}
+                      {field.cropType}
+                    </p>
                   </div>
-                  {/* <div className="flex justify-between text-[13px]">
+                  <div
+                    className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${statusStyles[status] || ""}`}
+                  >
+                    {field.currentStage}
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <div className="space-y-2 mb-6">
+                    <div className="flex justify-between text-[13px]">
+                      <span className="text-on-surface-variant">
+                        Planted on
+                      </span>
+                      <span className="font-semibold text-on-surface">
+                        {new Date(field.plantingDate).toLocaleDateString()}
+                      </span>
+                    </div>
+                    {/* <div className="flex justify-between text-[13px]">
                     <span className="text-on-surface-variant">
                       {field.attribute}
                     </span>
@@ -229,13 +207,17 @@ export default function MyFields() {
                       {field.attributeValue}
                     </span>
                   </div> */}
+                  </div>
                 </div>
+                <button
+                  onClick={() => openUpdateModal(field.id)}
+                  className="w-full py-3 bg-primary text-white rounded-lg font-label-md flex items-center justify-center gap-2 hover:bg-primary-container transition-colors mt-auto"
+                >
+                  Update Field
+                </button>
               </div>
-              <button className="w-full py-3 bg-primary text-white rounded-lg font-label-md flex items-center justify-center gap-2 hover:bg-primary-container transition-colors mt-auto">
-                Update Field
-              </button>
-            </div>
-          ))}
+            );
+          })}
 
           <div className="bg-primary-container text-on-primary-container rounded-xl p-4 shadow-[0_12px_24px_-10px_rgba(45,106,79,0.08)] flex flex-col justify-between border border-emerald-700/20">
             <div>
@@ -268,26 +250,6 @@ export default function MyFields() {
                 View Schedule
               </button>
             </div>
-          </div>
-
-          <div
-            onClick={openModel}
-            className="border-2 border-dashed border-emerald-100 rounded-xl p-4 flex flex-col items-center justify-center text-center group hover:border-emerald-300 transition-colors cursor-pointer bg-emerald-50/20"
-          >
-            <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center mb-4 shadow-sm group-hover:scale-110 transition-transform">
-              <MapPinPlusInside
-                className="material-symbols-outlined text-emerald-800 text-3xl"
-                data-icon="add_location"
-              >
-                add_location
-              </MapPinPlusInside>
-            </div>
-            <h4 className="font-semibold text-[16px] text-emerald-900 mb-2">
-              New Territory?
-            </h4>
-            <p className="text-[12px] text-zinc-500 max-w-[160px]">
-              Register a new plot to start field tracking and data logging.
-            </p>
           </div>
         </div>
         <div className="mt-lg flex items-center justify-between border-t border-zinc-100 pt-8">
@@ -322,10 +284,30 @@ export default function MyFields() {
       {isOpen && (
         <>
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-md">
-            <div className="relative bg-white w-full max-w-lg rounded-2xl custom-shadow-lvl2 overflow-hidden flex flex-col">
-              <form onSubmit={handleUpdateField}>
+            <div className="relative px-8 py-6 bg-white w-full max-w-lg rounded-2xl custom-shadow-lvl2 overflow-hidden flex flex-col">
+              <form
+                onSubmit={handleUpdateField}
+                className="flex flex-col gap-5"
+              >
+                <div className="px-8 py-6 border-b border-zinc-100 flex items-center justify-between bg-emerald-50/10">
+                  <div>
+                    <h3 className="text-2xl font-bold text-primary">
+                      Add Update
+                    </h3>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={closeModal}
+                    className="text-zinc-400 hover:text-zinc-600 cursor-pointer"
+                  >
+                    <X className="material-symbols-outlined" data-icon="close">
+                      close
+                    </X>
+                  </button>
+                </div>
                 <select
                   value={selectedFieldId}
+                  className="w-full bg-[#F1F3F5] border-zinc-200 rounded-lg px-4 py-2.5 focus:ring-primary/10 focus:border-primary focus:bg-white transition-all outline-none appearance-none"
                   onChange={(e) => setSelectedFieldId(e.target.value)}
                 >
                   <option value="">Select field</option>
@@ -339,6 +321,7 @@ export default function MyFields() {
                 <select
                   value={newStage}
                   onChange={(e) => setNewStage(e.target.value)}
+                  className="w-full bg-[#F1F3F5] border-zinc-200 rounded-lg px-4 py-2.5 focus:ring-primary/10 focus:border-primary focus:bg-white transition-all outline-none appearance-none"
                 >
                   <option value="">Select stage</option>
                   <option value="planted">Planted</option>
@@ -349,11 +332,15 @@ export default function MyFields() {
 
                 <textarea
                   value={note}
+                  className="resize-none border rounded-md p-3 w-full bg-[#F1F3F5] border-zinc-200 px-4 py-2.5 focus:ring-primary/10 focus:border-primary focus:bg-white transition-all outline-none appearance-none"
                   onChange={(e) => setNote(e.target.value)}
                   placeholder="Enter notes"
                 />
 
-                <button type="submit">
+                <button
+                  className="bg-primary hover:bg-emerald-900 text-white px-8 py-2.5 rounded-lg font-label-md transition-colors custom-shadow-lvl1"
+                  type="submit"
+                >
                   {submitting ? "Saving..." : "Submit Update"}
                 </button>
               </form>

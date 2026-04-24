@@ -10,7 +10,13 @@ const prisma = new PrismaClient({ adapter });
 
 export const getAdminDashboardData = async (req, res) => {
   try {
-    const fields = await prisma.field.findMany();
+    const fields = await prisma.field.findMany({
+      select : {
+        id : true,
+        currentStage : true,
+        createdAt : true
+      }
+    });
 
     let active = 0;
     let completed = 0;
@@ -51,11 +57,20 @@ export const getAdminDashboardData = async (req, res) => {
 };
 export const getAgentDashboardData = async (req, res) => {
   try {
-    const agentId = req.user.userId;
+    const agentId = req.user?.userId;
+
+    if (!agentId) {
+      return res.status(400).json({
+        message: "Agent ID is required",
+      });
+    }
 
     const fields = await prisma.field.findMany({
       where: {
         assignedAgentId: agentId,
+      },
+      orderBy: {
+        createdAt: "desc",
       },
     });
 
@@ -81,6 +96,9 @@ export const getAgentDashboardData = async (req, res) => {
       },
       take: 5,
       orderBy: { createdAt: "desc" },
+      include: {
+        field: true,
+      },
     });
 
     res.json({
@@ -89,6 +107,10 @@ export const getAgentDashboardData = async (req, res) => {
       completedFields: completed,
       atRiskFields: atRisk,
       recentUpdates,
+      fields: fields.map((field) => ({
+        ...field,
+        status: getFieldStatus(field),
+      })),
     });
   } catch (error) {
     console.error("Error fetching agent dashboard data:", error);

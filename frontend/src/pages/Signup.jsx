@@ -3,16 +3,23 @@ import { Eye, Lock, Mail, Tractor, User } from "lucide-react";
 import { useState } from "react";
 import { ClipLoader } from "react-spinners";
 import { toast } from "sonner";
+import api from "../lib/api";
+import { useNavigate } from "react-router-dom";
+
 
 const Signup = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
+
 
   const handleNameChange = (e) => {
     setName(e.target.value);
   };
+
+
 
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
@@ -32,7 +39,7 @@ const Signup = () => {
 
     setLoading(true);
     try {
-      const response = await axios.post(`http://localhost:5000/auth/register`, {
+      const response = await api.post(`/auth/register`, {
         name,
         email,
         password,
@@ -40,6 +47,7 @@ const Signup = () => {
 
       console.log(response.data);
       toast.success("Signup successful");
+      navigate("/login");
     } catch (error) {
       toast.error(error);
     } finally {

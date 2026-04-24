@@ -10,24 +10,32 @@ import {
 import DoughnutChart from "../../components/charts/AdminDashboardChart";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import api from "../../lib/api";
+import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 export default function DashboardAdmin() {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState({});
   const [fieldsPercentage, setFieldsPercentage] = useState(0);
+  const [updates, setUpdates] = useState([]);
+
+  const navigate = useNavigate();
+
   const handleLogout = () => {
-    window.alert("Logout action goes here.");
+    localStorage.clear();
+    navigate("/login");
+    toast.success("Logout successful");
   };
 
   useEffect(() => {
     const fetchAdminDashboard = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(
-          "http://localhost:5000/dashboard/admin",
+        const response = await api.get(
+          "/dashboard/admin",
         );
         setData(response.data);
-        console.log(response.data);
       } catch (error) {
         console.error(error);
       } finally {
@@ -38,12 +46,26 @@ export default function DashboardAdmin() {
     fetchAdminDashboard();
   }, []);
 
-  useEffect(() => {
-    if (!data.totalFields || !data.completedFields) return;
+useEffect(() => {
+  if (!data.totalFields) return;
 
-    const percentage = (data.completedFields / data.totalFields) * 100;
-    setFieldsPercentage(percentage);
-  }, [data]);
+  const percentage = (data.completedFields / data.totalFields) * 100;
+
+  setFieldsPercentage(Math.round(percentage));
+}, [data]);
+
+  useEffect(() => {
+    const fetchUpdates = async () => {
+      try {
+        const response = await api.get("/updates");
+        setUpdates(response.data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchUpdates();
+  }, []);
 
   return (
     <RoleDashboardLayout
@@ -59,9 +81,7 @@ export default function DashboardAdmin() {
               <div className="p-2 bg-emerald-50 rounded-lg text-emerald-700">
                 <Map className="material-symbols-outlined" />
               </div>
-              <span className="text-emerald-600 bg-emerald-50 px-2 py-1 rounded text-caption font-bold">
-                +12%
-              </span>
+             
             </div>
             <p className="text-zinc-500 text-label-md font-medium">
               Total Fields
@@ -75,9 +95,7 @@ export default function DashboardAdmin() {
               <div className="p-2 bg-emerald-50 rounded-lg text-emerald-700">
                 <CircleCheck className="material-symbols-outlined" />
               </div>
-              <span className="text-emerald-600 bg-emerald-50 px-2 py-1 rounded text-caption font-bold">
-                Stable
-              </span>
+             
             </div>
             <p className="text-zinc-500 text-label-md font-medium">
               Active Fields
@@ -91,9 +109,7 @@ export default function DashboardAdmin() {
               <div className="p-2 bg-red-50 rounded-lg text-red-600">
                 <TriangleAlert className="material-symbols-outlined" />
               </div>
-              <span className="text-red-600 bg-red-50 px-2 py-1 rounded text-caption font-bold">
-                +3
-              </span>
+              
             </div>
             <p className="text-zinc-500 text-label-md font-medium">
               At Risk Fields
@@ -107,9 +123,7 @@ export default function DashboardAdmin() {
               <div className="p-2 bg-zinc-50 rounded-lg text-zinc-700">
                 <ClipboardCheck className="material-symbols-outlined" />
               </div>
-              <span className="text-emerald-600 bg-emerald-50 px-2 py-1 rounded text-caption font-bold">
-                94%
-              </span>
+              
             </div>
             <p className="text-zinc-500 text-label-md font-medium">
               Completed Fields
@@ -126,7 +140,11 @@ export default function DashboardAdmin() {
             </h4>
             <div className="flex-1 flex flex-col items-center justify-center">
               <div className="relative w-48 h-48 flex items-center justify-center">
-                <DoughnutChart />
+                <DoughnutChart
+                  active={data.activeFields}
+                  atRisk={data.atRiskFields}
+                  completed={data.completedFields}
+                />
                 <div className="absolute flex flex-col items-center">
                   <span className="text-h3 font-h3">{fieldsPercentage}%</span>
                   <span className="text-caption text-zinc-500">Active</span>
@@ -176,7 +194,37 @@ export default function DashboardAdmin() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-100">
-                  <tr className="hover:bg-zinc-50/50 transition-colors">
+                  {updates.map((update) => (
+                    <tr
+                      key={update.id}
+                      className="hover:bg-zinc-50/50 transition-colors"
+                    >
+                      <td className="px-6 py-4">
+                        <span className="font-label-md text-on-surface">
+                          {update.field.name}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-2">
+                          <span className="text-label-md text-zinc-600">
+                            {update.agent.name}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="px-2 py-1 bg-emerald-50 text-emerald-700 rounded text-[11px] font-bold uppercase">
+                          {update.newStage}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-body-md text-zinc-500 italic text-sm">
+                        {update.note}
+                      </td>
+                      <td className="px-6 py-4 text-caption text-zinc-400">
+                        {new Date(update.createdAt).toLocaleString()}
+                      </td>
+                    </tr>
+                  ))}
+                  {/* <tr className="hover:bg-zinc-50/50 transition-colors">
                     <td className="px-6 py-4">
                       <span className="font-label-md text-on-surface">
                         North Cornfield
@@ -315,7 +363,7 @@ export default function DashboardAdmin() {
                     <td className="px-6 py-4 text-caption text-zinc-400">
                       Oct 21
                     </td>
-                  </tr>
+                  </tr> */}
                 </tbody>
               </table>
             </div>

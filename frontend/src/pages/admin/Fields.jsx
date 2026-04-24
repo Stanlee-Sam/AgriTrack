@@ -12,9 +12,12 @@ import RoleDashboardLayout from "../../components/layout/RoleDashboardLayout";
 import { navigationByRole } from "../../components/layout/navigation";
 import { CircleCheck, TriangleAlert } from "lucide-react";
 import { useEffect, useState } from "react";
+import axios from "axios";
+import api from "../../lib/api";
+import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 export default function Fields() {
-  const [isOpen, setIsOpen] = useState(false);
   const [fields, setFields] = useState([]);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -22,22 +25,25 @@ export default function Fields() {
     cropType: "",
     plantingDate: "",
     currentStage: "planted",
+    assignedAgentId: "",
   });
   const [agents, setAgents] = useState([]);
+  const [editingFieldId, setEditingFieldId] = useState(null);
+  const [mode, setMode] = useState(null);
+
+  const navigate = useNavigate();
 
   const handleLogout = () => {
-    window.alert("Logout action goes here.");
-  };
-
-  const modalOpen = () => {
-    setIsOpen(!isOpen);
+    localStorage.clear();
+    navigate("/login");
+    toast.success("Logout successful");
   };
 
   useEffect(() => {
     const fetchFields = async () => {
       setLoading(true);
       try {
-        const response = await axios.get("http://localhost:5000/fields");
+        const response = await api.get("/fields");
         setFields(response.data);
       } catch (error) {
         console.error(error);
@@ -53,19 +59,18 @@ export default function Fields() {
     e.preventDefault();
 
     try {
-      await axios.post("http://localhost:5000/fields/create", formData);
-      alert("Field created");
-
-      const response = await axios.get("http://localhost:5000/fields");
-      setFields(response.data);
+      const res = await api.post("/fields/create", formData);
+      setFields((prev) => [res.data, ...prev]);
 
       setFormData({
         name: "",
         cropType: "",
         plantingDate: "",
         currentStage: "planted",
+        assignedAgentId: "",
       });
-      setIsOpen(false);
+      setMode(null);
+      toast.success("Field created successfully");
     } catch (error) {
       console.error(error);
       alert("Failed to create field");
@@ -75,7 +80,7 @@ export default function Fields() {
   useEffect(() => {
     const fetchAgents = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/fields/agents");
+        const response = await api.get("/fields/agents");
         setAgents(response.data);
       } catch (error) {
         console.error(error);
@@ -87,16 +92,82 @@ export default function Fields() {
 
   const handleAssignAgent = async (fieldId, assignedAgentId) => {
     try {
-      await axios.put(`http://localhost:5000/fields/${fieldId}/assign`, {
+      const res = await api.put(`/fields/${fieldId}/assign`, {
         assignedAgentId,
       });
 
-      const response = await axios.get("http://localhost:5000/fields");
-      setFields(response.data);
+      setFields((prev) => prev.map((f) => (f.id === fieldId ? res.data : f)));
+
+      toast.success("Field assigned successfully");
     } catch (error) {
       console.error(error);
-      alert("Failed to assign field");
+      toast.error("Failed to assign field");
     }
+  };
+
+  const openEditModal = (field) => {
+    setFormData({
+      name: field.name,
+      cropType: field.cropType,
+      plantingDate: field.plantingDate?.split("T")[0],
+      currentStage: field.currentStage,
+      assignedAgentId: field.assignedAgentId || field.agent?.id || "",
+    });
+
+    setEditingFieldId(field.id);
+    setMode("edit");
+  };
+
+  const handleUpdateField = async (e) => {
+    e.preventDefault();
+
+    try {
+      const res = await api.put(`/fields/update/${editingFieldId}`, formData);
+
+      const updated = res.data;
+
+      setFields((prev) =>
+        prev.map((f) => (f.id === editingFieldId ? updated : f)),
+      );
+
+      setFormData({
+        name: "",
+        cropType: "",
+        plantingDate: "",
+        currentStage: "planted",
+        assignedAgentId: "",
+      });
+
+      setMode(null);
+      setEditingFieldId(null);
+
+      toast.success("Field updated successfully");
+    } catch (error) {
+      console.error(error);
+      alert("Failed to update field");
+    }
+  };
+  const openCreateModal = () => {
+    setFormData({
+      name: "",
+      cropType: "",
+      plantingDate: "",
+      currentStage: "planted",
+      assignedAgentId: "",
+    });
+    setMode("create");
+  };
+  const closeModal = () => {
+    setMode(null);
+    setEditingFieldId(null);
+
+    setFormData({
+      name: "",
+      cropType: "",
+      plantingDate: "",
+      currentStage: "planted",
+      assignedAgentId: "",
+    });
   };
 
   return (
@@ -116,7 +187,7 @@ export default function Fields() {
             </p>
           </div>
           <button
-            onClick={modalOpen}
+            onClick={openCreateModal}
             className="bg-primary text-on-primary px-5 py-3 rounded-lg font-bold flex flex-row items-center justify-center gap-2 hover:bg-[#0a3d2a] transition-colors shadow-sm"
           >
             <Plus
@@ -126,7 +197,7 @@ export default function Fields() {
             Add New Field
           </button>
         </header>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-5 mb-4">
+        {/* <div className="grid grid-cols-1 md:grid-cols-4 gap-5 mb-4">
           <div className="bg-white p-5 rounded-lg shadow-ambient">
             <p className="text-bold text-outline mb-1 uppercase tracking-wider">
               Total Area
@@ -168,7 +239,7 @@ export default function Fields() {
               <span className="text-body-md text-outline">On-site</span>
             </div>
           </div>
-        </div>
+        </div> */}
         <div className="bg-white rounded-xl shadow-ambient overflow-hidden">
           <div className="p-5 border-b border-outline-variant flex justify-between items-center bg-zinc-50/30">
             <div className="flex gap-4">
@@ -192,7 +263,7 @@ export default function Fields() {
               </button>
             </div>
             <div className="font-bold text-outline">
-              Showing 24 active fields
+              Showing {fields.length} active fields
             </div>
           </div>
           <div className="overflow-x-auto">
@@ -224,7 +295,10 @@ export default function Fields() {
               </thead>
               <tbody className="divide-y divide-outline-variant">
                 {fields.map((field) => (
-                  <tr className="table-row-hover transition-colors">
+                  <tr
+                    key={field.id}
+                    className="table-row-hover transition-colors"
+                  >
                     <td className="px-4 py-4">
                       <div className="flex items-center gap-3">
                         <div>
@@ -243,17 +317,14 @@ export default function Fields() {
                     <td className="px-gutter py-4 text-body-md text-on-surface-variant">
                       {new Date(field.plantingDate).toDateString()}
                     </td>
-                    <td className="px-gutter py-4">
-                      <div className="w-full bg-zinc-100 rounded-full h-2 mb-1 max-w-[120px]">
-                        <div className="bg-primary h-2 rounded-full w-3/4"></div>
-                      </div>
+                    <td className="px-5 py-4">
                       <span className="text-caption text-primary font-semibold">
                         {field.currentStage}
                       </span>
                     </td>
                     <td className="px-gutter py-4">
                       <span className="text-body-md">
-                        {field.assignedAgent}
+                        {field.agent?.name || "Unassigned"}{" "}
                       </span>
                     </td>
                     <td className="px-gutter py-4">
@@ -262,7 +333,10 @@ export default function Fields() {
                       </span>
                     </td>
                     <td className="px-4 py-4 text-right">
-                      <button className="p-2 hover:bg-zinc-200 rounded-lg transition-colors text-outline">
+                      <button
+                        onClick={() => openEditModal(field)}
+                        className="p-2 hover:bg-zinc-200 rounded-lg transition-colors text-outline"
+                      >
                         <Edit
                           className="material-symbols-outlined"
                           data-icon="edit"
@@ -273,190 +347,6 @@ export default function Fields() {
                     </td>
                   </tr>
                 ))}
-                <tr className="table-row-hover transition-colors">
-                  <td className="px-4 py-4">
-                    <div className="flex items-center gap-3">
-                      <div>
-                        <div className="font-label-md text-on-surface">
-                          North Plateau A1
-                        </div>
-                        <div className="text-caption text-outline">
-                          120 Acres • Soil Type: Loamy
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-gutter py-4 text-body-md text-on-surface-variant">
-                    Organic Corn
-                  </td>
-                  <td className="px-gutter py-4 text-body-md text-on-surface-variant">
-                    Mar 12, 2024
-                  </td>
-                  <td className="px-gutter py-4">
-                    <div className="w-full bg-zinc-100 rounded-full h-2 mb-1 max-w-[120px]">
-                      <div className="bg-primary h-2 rounded-full w-3/4"></div>
-                    </div>
-                    <span className="text-caption text-primary font-semibold">
-                      Tasseling Stage
-                    </span>
-                  </td>
-                  <td className="px-gutter py-4">
-                    <span className="text-body-md">David Miller</span>
-                  </td>
-                  <td className="px-gutter py-4">
-                    <span className="px-3 py-1 bg-secondary-fixed text-on-secondary-fixed-variant rounded-full text-caption font-bold">
-                      Optimal
-                    </span>
-                  </td>
-                  <td className="px-4 py-4 text-right">
-                    <button className="p-2 hover:bg-zinc-200 rounded-lg transition-colors text-outline">
-                      <Edit
-                        className="material-symbols-outlined"
-                        data-icon="edit"
-                      >
-                        edit
-                      </Edit>
-                    </button>
-                  </td>
-                </tr>
-                <tr className="table-row-hover transition-colors">
-                  <td className="px-4 py-4">
-                    <div className="flex items-center gap-3">
-                      <div>
-                        <div className="font-label-md text-on-surface">
-                          East Valley B4
-                        </div>
-                        <div className="text-caption text-outline">
-                          85 Acres • Soil Type: Clay
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-gutter py-4 text-body-md text-on-surface-variant">
-                    Winter Wheat
-                  </td>
-                  <td className="px-gutter py-4 text-body-md text-on-surface-variant">
-                    Feb 28, 2024
-                  </td>
-                  <td className="px-gutter py-4">
-                    <div className="w-full bg-zinc-100 rounded-full h-2 mb-1 max-w-[120px]">
-                      <div className="bg-primary h-2 rounded-full w-full"></div>
-                    </div>
-                    <span className="text-caption text-primary font-semibold">
-                      Ripening
-                    </span>
-                  </td>
-                  <td className="px-gutter py-4">
-                    <span className="text-body-md">Sarah Jenkins</span>
-                  </td>
-                  <td className="px-gutter py-4">
-                    <span className="px-3 py-1 bg-tertiary-fixed text-on-tertiary-fixed-variant rounded-full text-caption font-bold">
-                      In-Review
-                    </span>
-                  </td>
-                  <td className="px-4 py-4 text-right">
-                    <button className="p-2 hover:bg-zinc-200 rounded-lg transition-colors text-outline">
-                      <Edit
-                        className="material-symbols-outlined"
-                        data-icon="edit"
-                      >
-                        edit
-                      </Edit>
-                    </button>
-                  </td>
-                </tr>
-                <tr className="table-row-hover transition-colors">
-                  <td className="px-4 py-4">
-                    <div className="flex items-center gap-3">
-                      <div>
-                        <div className="font-label-md text-on-surface">
-                          South Ridge G2
-                        </div>
-                        <div className="text-caption text-outline">
-                          210 Acres • Soil Type: Sandy
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-gutter py-4 text-body-md text-on-surface-variant">
-                    Soybeans
-                  </td>
-                  <td className="px-gutter py-4 text-body-md text-on-surface-variant">
-                    Apr 05, 2024
-                  </td>
-                  <td className="px-gutter py-4">
-                    <div className="w-full bg-zinc-100 rounded-full h-2 mb-1 max-w-[120px]">
-                      <div className="bg-primary h-2 rounded-full w-1/4"></div>
-                    </div>
-                    <span className="text-caption text-primary font-semibold">
-                      Germination
-                    </span>
-                  </td>
-                  <td className="px-gutter py-4">
-                    <span className="text-body-md">Robert Chen</span>
-                  </td>
-                  <td className="px-gutter py-4">
-                    <span className="px-3 py-1 bg-error-container text-on-error-container rounded-full text-caption font-bold">
-                      Needs Irrigation
-                    </span>
-                  </td>
-                  <td className="px-4 py-4 text-right">
-                    <button className="p-2 hover:bg-zinc-200 rounded-lg transition-colors text-outline">
-                      <Edit
-                        className="material-symbols-outlined"
-                        data-icon="edit"
-                      >
-                        edit
-                      </Edit>
-                    </button>
-                  </td>
-                </tr>
-                <tr className="table-row-hover transition-colors">
-                  <td className="px-4 py-4">
-                    <div className="flex items-center gap-3">
-                      <div>
-                        <div className="font-label-md text-on-surface">
-                          West Gate Orchard
-                        </div>
-                        <div className="text-caption text-outline">
-                          45 Acres • Soil Type: Rich Silty
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-gutter py-4 text-body-md text-on-surface-variant">
-                    Almonds
-                  </td>
-                  <td className="px-gutter py-4 text-body-md text-on-surface-variant">
-                    Jan 15, 2024
-                  </td>
-                  <td className="px-gutter py-4">
-                    <div className="w-full bg-zinc-100 rounded-full h-2 mb-1 max-w-[120px]">
-                      <div className="bg-primary h-2 rounded-full w-2/3"></div>
-                    </div>
-                    <span className="text-caption text-primary font-semibold">
-                      Nut Development
-                    </span>
-                  </td>
-                  <td className="px-gutter py-4">
-                    <span className="text-body-md">Elena Rodriguez</span>
-                  </td>
-                  <td className="px-gutter py-4">
-                    <span className="px-3 py-1 bg-secondary-fixed text-on-secondary-fixed-variant rounded-full text-caption font-bold">
-                      Optimal
-                    </span>
-                  </td>
-                  <td className="px-4 py-4 text-right">
-                    <button className="p-2 hover:bg-zinc-200 rounded-lg transition-colors text-outline">
-                      <Edit
-                        className="material-symbols-outlined"
-                        data-icon="edit"
-                      >
-                        edit
-                      </Edit>
-                    </button>
-                  </td>
-                </tr>
               </tbody>
             </table>
           </div>
@@ -552,20 +442,27 @@ export default function Fields() {
         </div>
       </main>
 
-      {isOpen && (
+      {mode && (
         <>
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-md">
-            <form className="relative bg-white w-full max-w-lg rounded-2xl custom-shadow-lvl2 overflow-hidden flex flex-col">
+            <form
+              onSubmit={mode === "edit" ? handleUpdateField : handleCreateField}
+              className="relative bg-white w-full max-w-lg rounded-2xl custom-shadow-lvl2 overflow-hidden flex flex-col"
+            >
               <div className="px-8 py-6 border-b border-zinc-100 flex items-center justify-between bg-emerald-50/10">
                 <div>
                   <h3 className="text-2xl font-bold text-primary">
-                    Add New Field
+                    {mode === "edit" ? "Update Field" : "Add New Field"}
                   </h3>
                   <p className="text-sm text-zinc-500">
                     Enter plot details for new cultivation
                   </p>
                 </div>
-                <button className="text-zinc-400 hover:text-zinc-600 cursor-pointer">
+                <button
+                  className="text-zinc-400 hover:text-zinc-600 cursor-pointer"
+                  onClick={closeModal}
+                  type="button"
+                >
                   <X className="material-symbols-outlined" data-icon="close">
                     close
                   </X>
@@ -644,13 +541,16 @@ export default function Fields() {
                       Assign Agent
                     </label>
                     <select
+                      value={formData.assignedAgentId}
                       onChange={(e) =>
-                        handleAssignAgent(field.id, e.target.value)
+                        setFormData({
+                          ...formData,
+                          assignedAgentId: e.target.value,
+                        })
                       }
-                      defaultValue=""
                       className="w-full bg-[#F1F3F5] border-zinc-200 rounded-lg px-4 py-2.5 focus:ring-primary/10 focus:border-primary focus:bg-white transition-all outline-none appearance-none"
                     >
-                      <option value="">Assign agent</option>
+                      <option value="">Unassigned</option>
                       {agents.map((agent) => (
                         <option key={agent.id} value={agent.id}>
                           {agent.name}
@@ -662,13 +562,17 @@ export default function Fields() {
               </div>
               <div className="px-8 py-6 bg-zinc-50 border-t border-zinc-100 flex justify-end gap-3">
                 <button
-                  onClick={modalOpen}
+                  type="button"
+                  onClick={closeModal}
                   className="px-6 py-2.5 text-zinc-600 font-label-md hover:bg-zinc-200 rounded-lg transition-colors"
                 >
                   Cancel
                 </button>
-                <button className="bg-primary hover:bg-emerald-900 text-white px-8 py-2.5 rounded-lg font-label-md transition-colors custom-shadow-lvl1">
-                  Save Field
+                <button
+                  type="submit"
+                  className="bg-primary hover:bg-emerald-900 text-white px-8 py-2.5 rounded-lg font-label-md transition-colors custom-shadow-lvl1"
+                >
+                  {mode === "edit" ? "Update Field" : "Save Field"}{" "}
                 </button>
               </div>
             </form>

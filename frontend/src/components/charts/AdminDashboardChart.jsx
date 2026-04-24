@@ -5,33 +5,18 @@ import axios from "axios";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-const DoughnutChart = () => {
+const DoughnutChart = ({active, atRisk, completed}) => {
   const [dashboardData, setDashboardData] = useState({});
 
-  useEffect(() => {
-    const fetchAdminDashboard = async () => {
-      try {
-        const response = await axios.get(
-          "http://localhost:5000/dashboard/admin",
-        );
-        setDashboardData(response.data);
-        console.log(response.data);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    fetchAdminDashboard();
-  }, []);
 
   const data = {
     labels: ["Active", "At Risk", "Completed"],
     datasets: [
       {
         data: [
-          dashboardData.activeFields,
-          dashboardData.atRiskFields,
-          dashboardData.completedFields,
+          active || 0,
+          atRisk || 0,
+          completed || 0
         ],
         backgroundColor: ["#2d6a4f", "#ba1a1a", "#74c69d"],
         borderWidth: 0,

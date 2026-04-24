@@ -101,8 +101,7 @@ export default function Sidebar({
 }) {
   return (
     <>
-      <aside className="hidden h-screen w-72 shrink-0 border-r border-outline-variant bg-surface-container-lowest lg:flex">
-        <SidebarContent
+<aside className="hidden lg:flex w-72 shrink-0 border-r border-outline-variant bg-surface-container-lowest sticky top-0 h-screen">        <SidebarContent
           roleLabel={roleLabel}
           items={items}
           activeItem={activeItem}
