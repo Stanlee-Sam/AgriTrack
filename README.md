@@ -28,7 +28,11 @@ SmartSeason is a comprehensive field monitoring system designed to help agricult
    ```bash
    npx prisma migrate dev
    ```
-5. Start the server:
+5. Seed the database with test accounts:
+   ```bash
+   npx prisma db seed
+   ```
+6. Start the server:
    ```bash
    npm start
    ```
