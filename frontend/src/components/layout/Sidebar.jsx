@@ -58,7 +58,7 @@ function SidebarContent({
           <Tractor className="text-white text-2xl" />
         </div>
         <div>
-          <p className="text-2xl text-primary font-extrabold">AgriTrack</p>
+          <p className="text-2xl text-primary font-extrabold">SmartSeason</p>
           <p className="text-lg text-neutral font-semibold">{roleLabel} Portal</p>
         </div>
       </div>

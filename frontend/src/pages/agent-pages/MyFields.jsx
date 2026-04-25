@@ -40,7 +40,7 @@ export default function MyFields() {
   };
   const handleLogout = () => {
     localStorage.clear();
-    navigate("/login");
+    navigate("/");
     toast.success("Logout successful");
   };
 

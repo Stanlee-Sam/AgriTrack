@@ -73,7 +73,7 @@ export default function DashboardPreview() {
         <div className="flex flex-col gap-6 xl:flex-row xl:items-start xl:justify-between">
           <div className="max-w-3xl">
             <p className="text-xs font-medium leading-[1.2] uppercase tracking-[0.14em] text-secondary">
-              AgriTrack dashboard
+              SmartSeason dashboard
             </p>
             <h1 className="mt-3 text-[3rem] font-bold leading-[1.2] tracking-[-0.02em] text-on-surface">
               {currentRoleCopy.heroTitle}

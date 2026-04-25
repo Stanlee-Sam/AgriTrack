@@ -76,10 +76,10 @@ const Login = () => {
               <Tractor className="h-10 w-10 text-primary" />
             </div>
             <h1 className="mb-2 text-[2rem] font-semibold leading-[1.3] tracking-[-0.01em] text-primary">
-              AgriTrack
+              SmartSeason
             </h1>
             <p className="text-[15px] md:text-[20px] text-center text-on-surface-variant">
-              Digital Agronomy &amp; Farm Management
+              Farm Management System
             </p>
           </div>
 

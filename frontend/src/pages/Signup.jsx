@@ -76,7 +76,7 @@ const Signup = () => {
               <Tractor className="h-10 w-10 text-primary" />
             </div>
             <h1 className="mb-2 text-[2rem] font-semibold leading-[1.3] tracking-[-0.01em] text-primary">
-              AgriTrack
+              SmartSeason
             </h1>
             <h3 className="text-[15px] md:text-[20px] font-bold">
               Create your account
@@ -187,7 +187,7 @@ const Signup = () => {
             </p>
 
             <a
-              href="/login"
+              href="/"
               className="text-primary text-[13px] transition-colors hover:text-tertiary"
             >
               Sign In

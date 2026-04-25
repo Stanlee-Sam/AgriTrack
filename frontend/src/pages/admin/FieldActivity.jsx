@@ -24,7 +24,7 @@ export default function FieldActivity() {
   const navigate = useNavigate();
   const handleLogout = () => {
     localStorage.clear();
-    navigate("/login");
+    navigate("/");
     toast.success("Logout successful");
   };
 

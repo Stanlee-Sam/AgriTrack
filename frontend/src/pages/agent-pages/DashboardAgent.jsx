@@ -30,7 +30,7 @@ export default function DashboardAgent() {
 
  const handleLogout = () => {
     localStorage.clear();
-    navigate("/login");
+    navigate("/");
     toast.success("Logout successful");
   };
 

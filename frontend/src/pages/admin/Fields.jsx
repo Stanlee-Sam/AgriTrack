@@ -35,7 +35,7 @@ export default function Fields() {
 
   const handleLogout = () => {
     localStorage.clear();
-    navigate("/login");
+    navigate("/");
     toast.success("Logout successful");
   };
 
