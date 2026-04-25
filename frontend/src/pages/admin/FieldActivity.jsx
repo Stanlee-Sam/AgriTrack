@@ -79,7 +79,7 @@ export default function FieldActivity() {
             </button>
           </div>
         </div>
-        <div className="mb-gutter grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* <div className="mb-gutter grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex items-center gap-4">
             <div className="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-700">
               <Tractor className="material-symbols-outlined">
@@ -115,7 +115,7 @@ export default function FieldActivity() {
               <p className="text-3xl font-bold text-on-surface">142</p>
             </div>
           </div>
-        </div>
+        </div> */}
         <div className="max-w-4xl mx-auto w-full">
           <div className="relative w-full">
             <div className="absolute left-6 top-0 bottom-0 w-px bg-slate-200 z-0"></div>
