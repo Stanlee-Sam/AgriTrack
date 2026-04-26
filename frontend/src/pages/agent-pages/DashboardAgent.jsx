@@ -78,8 +78,9 @@ export default function DashboardAgent() {
       try {
         const token = localStorage.getItem("token");
 
-        const response = await axios.get(
-          `http://localhost:5000/dashboard/agent/`,{
+        const response = await api.get(
+          `/dashboard/agent`,
+          {
             headers : {
               Authorization : `Bearer ${token}`
             }
@@ -100,8 +101,8 @@ export default function DashboardAgent() {
 
       try {
         const token = localStorage.getItem("token");
-        const response = await axios.get(
-          `http://localhost:5000/fields/assigned-fields`,
+        const response = await api.get(
+          `/fields/assigned-fields`,
           {
             headers : {
               Authorization : `Bearer ${token}`
