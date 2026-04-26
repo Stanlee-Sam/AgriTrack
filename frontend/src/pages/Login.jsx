@@ -48,7 +48,7 @@ const Login = () => {
         navigate("/dashboard-agent");
       }
     } catch (error) {
-      toast.error(error);
+      toast.error(error.response?.data?.message || error.message);
     } finally {
       setLoading(false);
     }

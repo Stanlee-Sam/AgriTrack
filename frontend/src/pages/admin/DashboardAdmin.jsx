@@ -3,6 +3,7 @@ import { navigationByRole } from "../../components/layout/navigation";
 import {
   CircleCheck,
   ClipboardCheck,
+  History,
   Leaf,
   Map,
   TriangleAlert,
@@ -13,6 +14,7 @@ import axios from "axios";
 import api from "../../lib/api";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import EmptyState from "../../components/common/EmptyState";
 
 export default function DashboardAdmin() {
   const [loading, setLoading] = useState(false);
@@ -175,197 +177,69 @@ useEffect(() => {
               </div>
             </div>
           </div>
-          <div className="lg:col-span-8 bg-white rounded-xl border border-zinc-100 shadow-[0_12px_24px_-10px_rgba(45,106,79,0.08)] overflow-hidden">
+          <div className="lg:col-span-8 bg-white rounded-xl border border-zinc-100 shadow-[0_12px_24px_-10px_rgba(45,106,79,0.08)] overflow-hidden flex flex-col">
             <div className="p-6 border-b border-zinc-100 flex justify-between items-center">
               <h4 className="font-h3 text-body-lg">Recent Field Updates</h4>
-              <button className="text-emerald-700 text-label-md hover:underline">
-                View All Updates
-              </button>
+              {updates.length > 0 && (
+                <button className="text-emerald-700 text-label-md hover:underline">
+                  View All Updates
+                </button>
+              )}
             </div>
-            <div className="overflow-x-auto">
-              <table className="w-full text-left">
-                <thead className="bg-surface-container-low text-zinc-600 text-caption uppercase tracking-wider">
-                  <tr>
-                    <th className="px-6 py-4 font-bold">Field Name</th>
-                    <th className="px-6 py-4 font-bold">Agent</th>
-                    <th className="px-6 py-4 font-bold">Stage</th>
-                    <th className="px-6 py-4 font-bold">Note</th>
-                    <th className="px-6 py-4 font-bold">Date</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-zinc-100">
-                  {updates.map((update) => (
-                    <tr
-                      key={update.id}
-                      className="hover:bg-zinc-50/50 transition-colors"
-                    >
-                      <td className="px-6 py-4">
-                        <span className="font-label-md text-on-surface">
-                          {update.field.name}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-2">
-                          <span className="text-label-md text-zinc-600">
-                            {update.agent.name}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <span className="px-2 py-1 bg-emerald-50 text-emerald-700 rounded text-[11px] font-bold uppercase">
-                          {update.newStage}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-body-md text-zinc-500 italic text-sm">
-                        {update.note}
-                      </td>
-                      <td className="px-6 py-4 text-caption text-zinc-400">
-                        {new Date(update.createdAt).toLocaleString()}
-                      </td>
+            <div className="flex-1 overflow-x-auto">
+              {updates.length === 0 ? (
+                <div className="p-12">
+                  <EmptyState 
+                    title="No recent updates"
+                    description="There haven't been any field updates recorded yet. Once agents start reporting, they'll appear here."
+                    icon={History}
+                  />
+                </div>
+              ) : (
+                <table className="w-full text-left">
+                  <thead className="bg-surface-container-low text-zinc-600 text-caption uppercase tracking-wider">
+                    <tr>
+                      <th className="px-6 py-4 font-bold">Field Name</th>
+                      <th className="px-6 py-4 font-bold">Agent</th>
+                      <th className="px-6 py-4 font-bold">Stage</th>
+                      <th className="px-6 py-4 font-bold">Note</th>
+                      <th className="px-6 py-4 font-bold">Date</th>
                     </tr>
-                  ))}
-                  {/* <tr className="hover:bg-zinc-50/50 transition-colors">
-                    <td className="px-6 py-4">
-                      <span className="font-label-md text-on-surface">
-                        North Cornfield
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center text-[10px] font-bold text-emerald-800">
-                          SM
-                        </div>
-                        <span className="text-label-md text-zinc-600">
-                          Sarah Miller
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="px-2 py-1 bg-emerald-50 text-emerald-700 rounded text-[11px] font-bold uppercase">
-                        Harvesting
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-body-md text-zinc-500 italic text-sm">
-                      Good yield expected
-                    </td>
-                    <td className="px-6 py-4 text-caption text-zinc-400">
-                      Oct 24
-                    </td>
-                  </tr>
-                  <tr className="hover:bg-zinc-50/50 transition-colors">
-                    <td className="px-6 py-4">
-                      <span className="font-label-md text-on-surface">
-                        East Vineyard
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-full bg-zinc-100 flex items-center justify-center text-[10px] font-bold text-zinc-800">
-                          JH
-                        </div>
-                        <span className="text-label-md text-zinc-600">
-                          James Holt
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="px-2 py-1 bg-emerald-50 text-emerald-700 rounded text-[11px] font-bold uppercase">
-                        Irrigating
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-body-md text-zinc-500 italic text-sm">
-                      Optimal soil moisture
-                    </td>
-                    <td className="px-6 py-4 text-caption text-zinc-400">
-                      Oct 23
-                    </td>
-                  </tr>
-                  <tr className="hover:bg-zinc-50/50 transition-colors">
-                    <td className="px-6 py-4">
-                      <span className="font-label-md text-on-surface">
-                        West Meadow
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-full bg-red-100 flex items-center justify-center text-[10px] font-bold text-red-800">
-                          RB
-                        </div>
-                        <span className="text-label-md text-zinc-600">
-                          Rob Blake
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="px-2 py-1 bg-red-50 text-red-600 rounded text-[11px] font-bold uppercase">
-                        At Risk
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-body-md text-zinc-500 italic text-sm">
-                      Pest detection alerts
-                    </td>
-                    <td className="px-6 py-4 text-caption text-zinc-400">
-                      Oct 23
-                    </td>
-                  </tr>
-                  <tr className="hover:bg-zinc-50/50 transition-colors">
-                    <td className="px-6 py-4">
-                      <span className="font-label-md text-on-surface">
-                        South Plateau
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center text-[10px] font-bold text-emerald-800">
-                          SM
-                        </div>
-                        <span className="text-label-md text-zinc-600">
-                          Sarah Miller
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="px-2 py-1 bg-zinc-100 text-zinc-600 rounded text-[11px] font-bold uppercase">
-                        Seeding
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-body-md text-zinc-500 italic text-sm">
-                      Winter wheat rotation
-                    </td>
-                    <td className="px-6 py-4 text-caption text-zinc-400">
-                      Oct 22
-                    </td>
-                  </tr>
-                  <tr className="hover:bg-zinc-50/50 transition-colors">
-                    <td className="px-6 py-4">
-                      <span className="font-label-md text-on-surface">
-                        Valley Row 12
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center text-[10px] font-bold text-emerald-800">
-                          JH
-                        </div>
-                        <span className="text-label-md text-zinc-600">
-                          James Holt
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="px-2 py-1 bg-emerald-50 text-emerald-700 rounded text-[11px] font-bold uppercase">
-                        Completed
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-body-md text-zinc-500 italic text-sm">
-                      Storage transfer done
-                    </td>
-                    <td className="px-6 py-4 text-caption text-zinc-400">
-                      Oct 21
-                    </td>
-                  </tr> */}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="divide-y divide-zinc-100">
+                    {updates.map((update) => (
+                      <tr
+                        key={update.id}
+                        className="hover:bg-zinc-50/50 transition-colors"
+                      >
+                        <td className="px-6 py-4">
+                          <span className="font-label-md text-on-surface">
+                            {update.field.name}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-2">
+                            <span className="text-label-md text-zinc-600">
+                              {update.agent.name}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className="px-2 py-1 bg-emerald-50 text-emerald-700 rounded text-[11px] font-bold uppercase">
+                            {update.newStage}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-body-md text-zinc-500 italic text-sm">
+                          {update.note}
+                        </td>
+                        <td className="px-6 py-4 text-caption text-zinc-400">
+                          {new Date(update.createdAt).toLocaleString()}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
             </div>
           </div>
         </section>
