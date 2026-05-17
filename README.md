@@ -2,14 +2,14 @@
 
 SmartSeason is a comprehensive field monitoring system designed to help agricultural teams track crop progress across multiple fields during a growing season. The system provides role-based access for Admins (Coordinators) and Field Agents, ensuring efficient data collection and oversight.
 
-## 🚀 Live Demo
+## Live Demo
 
 - **Frontend:** [https://smart-season-field-monitoring-syste-alpha-coral.vercel.app](https://smart-season-field-monitoring-syste-alpha-coral.vercel.app)
 - **Backend API:** [https://smartseason-field-monitoring-system-oced.onrender.com](https://smartseason-field-monitoring-system-oced.onrender.com)
 
 ---
 
-## 🔑 Demo Credentials
+## Demo Credentials
 
 Use the following accounts to explore the system's role-based features:
 
@@ -20,7 +20,7 @@ Use the following accounts to explore the system's role-based features:
 
 ---
 
-## 🏗️ Design Decisions
+## Design Decisions
 
 - **Clean System Design:** Utilized a monorepo-style structure with clear separation between the Express backend and React frontend.
 - **Modern UI:** Built with React and Vanilla CSS, focusing on high-precision data visualization. The interface uses a "Digital Agronomy" aesthetic—balancing organic growth themes with professional data management.
@@ -29,7 +29,7 @@ Use the following accounts to explore the system's role-based features:
 
 ---
 
-## 🌾 Field Status Logic (Approach)
+## Field Status Logic (Approach)
 
 The system computes a field's status based on its current stage and the time elapsed since planting:
 
@@ -39,7 +39,7 @@ The system computes a field's status based on its current stage and the time ela
 
 ---
 
-## 🛠️ Local Setup Instructions
+## Local Setup Instructions
 
 ### Backend Setup
 1. Navigate to the `backend` directory and install dependencies:
@@ -70,7 +70,7 @@ The system computes a field's status based on its current stage and the time ela
 
 ---
 
-## 📝 Assumptions
+## Assumptions
 
 1. **One Agent per Field:** Fields are assigned to a single agent to maintain clear accountability.
 2. **Sequential Progress:** It is assumed crops move forward through stages (Planted -> Growing -> Ready -> Harvested).
